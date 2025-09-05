@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:D8_Demo.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:D8_Demo.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
+        Height="800" Width="1500"
+        WindowStartupLocation="CenterScreen"
+        x:Class="D8_Demo.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="D8读卡器工具">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel LastChildFill="True">
+
+        <!-- 顶部菜单栏 -->
+        <Menu  Background="DodgerBlue" DockPanel.Dock="Top" DataContext="{Binding MenuVm}">
+            <MenuItem Header="_端口" Foreground="White">
+                <MenuItem Header="_打开端口" Command="{Binding NewCommand}" />
+                <MenuItem Header="_关闭端口" Command="{Binding OpenCommand}" />
+                <MenuItem Header="_退出" Command="{Binding ExitCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- 内容区，使用 Grid + GridSplitter 实现左边可拖动 -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <!-- 左边属性区，初始宽度 200 -->
+                <ColumnDefinition Width="400" MinWidth="200" />
+                <!-- 可拖动分割条 -->
+                <ColumnDefinition Width="1" />
+                <!-- 右边主内容，占满剩余空间 -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- 左边属性区 -->
+            <Grid Margin="10,10,5,10" Grid.RowDefinitions="Auto,*">
+                <!-- 端口操作区 -->
+                <Border Padding="10" Background="AliceBlue" Grid.Column="0" BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
+                    <ContentControl Content="{Binding ContentVm}">
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate DataType="viewModels:ContentViewModel">
+                                <Grid Grid.RowDefinitions="Auto,Auto">
+                                    <StackPanel Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="端口号:" VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding Port}" />
+                                        <TextBlock Text="波特率:" VerticalAlignment="Center"/>
+                                        <ComboBox ItemsSource="{Binding Options}"
+                                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay}" />
+                                    </StackPanel>
+                                    <StackPanel  Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+                                        <Button Content="打开端口"  Command="{Binding OpenPortCommand}" Theme="{DynamicResource SolidButton}"/>
+                                        <Button Content="关闭端口" Theme="{DynamicResource SolidButton}" Classes="Tertiary"/>
+                                        <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
+                                                  Width="24" Height="24"
+                                                  Foreground="{Binding Color}"/>
+                                    </StackPanel>
+                                
+                                </Grid>
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
+                </Border>
+                <!-- 侧边栏 -->
+                <Border Grid.Row="1" Margin="0,10,0,0" Padding="10" Grid.Column="0" BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
+                    </Border>
+            </Grid>
+            
+
+            <!-- 可拖动分割条 -->
+            <GridSplitter Grid.Column="1" ShowsPreview="False"/>
+
+            <!-- 右边主内容区 -->
+            <Border Margin="5,10,10,10" Grid.Column="2" BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
+                <ContentControl />
+            </Border>
+
+
+        </Grid>
+    </DockPanel>
+
+</Window>
