@@ -4,7 +4,10 @@
     <option name="projectPerEditor">
       <map>
         <entry key="App.axaml" value="D8_Demo.csproj" />
+        <entry key="Views/CardReadView.axaml" value="D8_Demo.csproj" />
+        <entry key="Views/HomeView.axaml" value="D8_Demo.csproj" />
         <entry key="Views/MainWindow.axaml" value="D8_Demo.csproj" />
+        <entry key="Views/SettingView.axaml" value="D8_Demo.csproj" />
         <entry key="Views/Test.axaml" value="D8_Demo.csproj" />
       </map>
     </option>

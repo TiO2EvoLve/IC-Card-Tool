@@ -67,3 +67,6 @@ D:\Project\C#\D8_Demo\obj\Debug\net9.0\D8_Demo.genruntimeconfig.cache
 D:\Project\C#\D8_Demo\obj\Debug\net9.0\ref\D8_Demo.dll
 D:\Project\C#\D8_Demo\bin\Debug\net9.0\dcrf32.dll
 D:\Project\C#\D8_Demo\bin\Debug\net9.0\Semi.Avalonia.dll
+D:\Project\C#\D8_Demo\obj\Debug\net9.0\D8_Demo.sourcelink.json
+D:\Project\C#\D8_Demo\bin\Debug\net9.0\DialogHost.Avalonia.dll
+D:\Project\C#\D8_Demo\bin\Debug\net9.0\MsBox.Avalonia.dll

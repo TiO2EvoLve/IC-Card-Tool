@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace D8_Demo.Views;
 
-public partial class Test : UserControl
+public partial class HomeView : UserControl
 {
-    public Test()
+    public HomeView()
     {
         InitializeComponent();
     }
