@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
+             xmlns:vm="using:D8_Demo.ViewModels"
+             xmlns:viewModels="clr-namespace:D8_Demo.ViewModels"
+             x:DataType="vm:ContentViewModel"
+             x:Class="D8_Demo.Views.ReadView">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ContentViewModel />
+    </Design.DataContext>
+    
+    <Grid Margin="20" RowDefinitions="Auto,Auto"  >
+        <StackPanel Margin="20" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBox Width="200"></TextBox>
+            <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
+                      Width="24" Height="24" Margin="10,0,10,0"
+                      Foreground="{Binding Color}" />
+            <Button Command="{Binding ReadCardCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
+        </StackPanel>
+        <Border Grid.Row="1" Padding="20" BorderBrush="Lavender" BorderThickness="1"
+                CornerRadius="10">
+            <Grid  RowDefinitions="Auto,Auto" >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">16进制不调整：</TextBlock>
+                    <TextBox MinWidth="100" Text="{Binding Uid16}"></TextBox>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">16进制调整：</TextBlock>
+                    <TextBox MinWidth="100" Text="{Binding Uid16_}"></TextBox>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">10进制不调整：</TextBlock>
+                    <TextBox MinWidth="100" Text="{Binding Uid10}"></TextBox>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">10进制调整：</TextBlock>
+                    <TextBox MinWidth="100" Text="{Binding Uid10_}"></TextBox>
+                </StackPanel>
+                <StackPanel Margin="0,30,0,0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <TextBlock VerticalAlignment="Center">ATS：</TextBlock>
+                    <TextBox MinWidth="600" Text="{Binding Ats}"></TextBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+       
+    </Grid>
+</UserControl>
