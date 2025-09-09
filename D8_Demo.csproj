@@ -35,11 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Views\UserControl\CardReadView.axaml.cs">
-        <DependentUpon>CardReadView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\UserControl\HomeView.axaml.cs">
+      <Compile Update="Views\UserControl\ReadView.axaml.cs">
         <DependentUpon>HomeView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
