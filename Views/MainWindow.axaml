@@ -63,7 +63,7 @@
                                         <Button Content="打开端口" Command="{Binding OpenPortCommand}"
                                                 Theme="{DynamicResource SolidButton}" />
                                         <Button Content="关闭端口"  Command="{Binding ClosePortCommand}"
-                                                Theme="{DynamicResource SolidButton}" Classes="Warning" />
+                                                Theme="{DynamicResource SolidButton}" Classes="Tertiary" />
                                         <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
                                                   Width="24" Height="24"
                                                   Foreground="{Binding Color}" />
