@@ -11,6 +11,9 @@
     </Application.DataTemplates>
   
     <Application.Styles>
+        
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <semi:SemiTheme Locale="zh-CN" />
         <semi:SemiPopupAnimations />
     </Application.Styles>
