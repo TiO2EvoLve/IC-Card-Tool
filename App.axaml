@@ -3,6 +3,7 @@
              x:Class="D8_Demo.App"
              xmlns:local="using:D8_Demo"
              xmlns:semi="https://irihi.tech/semi"
+             xmlns:u-semi="https://irihi.tech/ursa/themes/semi"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -11,10 +12,10 @@
     </Application.DataTemplates>
   
     <Application.Styles>
-        
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <semi:SemiTheme Locale="zh-CN" />
+        <u-semi:SemiTheme Locale="zh-CN"/>
         <semi:SemiPopupAnimations />
     </Application.Styles>
 </Application>

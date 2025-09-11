@@ -49,7 +49,6 @@ public partial class ContentViewModel : ViewModelBase
     [ObservableProperty] private string? firmwareVersion;
     //当前状态
     [ObservableProperty] private State? status = State.等待读取;
-    [ObservableProperty] private string statusColor = "Red";
     //波特率选项列表
     public ObservableCollection<string> Options { get; set; } =
     [
@@ -68,17 +67,19 @@ public partial class ContentViewModel : ViewModelBase
     [ObservableProperty] private bool isChecked = true;
     //卡片列表
     public ObservableCollection<Card> Cards { get; set; } = new();
-       
+
+    private ContentViewModel() { }
+    public static ContentViewModel Instance { get; } = new ();
     //打开端口
     [RelayCommand]
-    private async Task OpenPort()
+    public async Task OpenPort()
     {
         if (isConnected) return;//端口已经打开，无需继续操作。
         try
         {
             icdev = dc_init(Convert.ToInt16(Port), 115200);
             if (icdev < 0) {
-                await MessageBoxManager.GetMessageBoxStandard("失败", "打开端口失败,请检查读卡器是否已链接").ShowAsync();
+                await MessageBoxManager.GetMessageBoxStandard("失败", "打开端口失败,请检查读卡器是否已连接").ShowAsync();
             }else {
                 Color = Brushes.LimeGreen;
                 isConnected = true;//记录端口打开成功
@@ -111,7 +112,7 @@ public partial class ContentViewModel : ViewModelBase
     }
     //关闭端口
     [RelayCommand]
-    private async Task ClosePort()
+    public async Task ClosePort()
     {
         if (dc_exit(icdev) == 0)
         {
@@ -166,6 +167,9 @@ public partial class ContentViewModel : ViewModelBase
             var recbuff = new byte[100];
             if (dc_pro_resethex(icdev, ref crlen, ref recbuff[0]) != 0)
             {
+                Status = State.非CPU卡;
+                Ats = "非CPU卡";
+                Thread.Sleep(500);
                 continue;
             }
             string num = "";
@@ -229,6 +233,11 @@ public partial class ContentViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveData()
     {
+        if (Cards.Count == 0)
+        {
+            await MessageBoxManager.GetMessageBoxStandard("失败", "没有数据需要保存").ShowAsync();
+            return;
+        }
         var sourceFilePath = "temple/卡片信息.mdb";
         var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         var destinationFilePath = Path.Combine(desktopPath, "卡片信息.mdb");

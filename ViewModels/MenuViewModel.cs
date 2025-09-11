@@ -5,26 +5,23 @@ namespace D8_Demo.ViewModels;
 
 public partial class MenuViewModel : ViewModelBase
 {
-    [RelayCommand(CanExecute = nameof(CanNew))]
-    private void New()
-    {
-        Console.WriteLine("New file created.");
-    }
-
+    private readonly ContentViewModel ContentVM = ContentViewModel.Instance;
+    
     [RelayCommand]
     private void Open()
     {
-        Console.WriteLine("Open file dialog.");
+        _ = ContentVM.OpenPort();
+    }
+
+    [RelayCommand]
+    private void Close()
+    {
+        _ = ContentVM.ClosePort();
     }
 
     [RelayCommand]
     private void Exit()
     {
         Environment.Exit(0);
-    }
-    
-    private bool CanNew()
-    {
-        return true;
     }
 }

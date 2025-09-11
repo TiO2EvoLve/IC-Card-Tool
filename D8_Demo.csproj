@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,7 +24,12 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Irihi.Ursa" Version="1.12.0" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.12.0" />
         <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
         <PackageReference Include="Semi.Avalonia" Version="11.2.1.9" />
         <PackageReference Include="System.Data.OleDb" Version="9.0.9" />
     </ItemGroup>
@@ -35,6 +40,9 @@
       </None>
       <None Update="temple\卡片信息.mdb">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

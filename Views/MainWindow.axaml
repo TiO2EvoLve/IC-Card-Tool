@@ -24,8 +24,8 @@
         <!-- 顶部菜单栏 -->
         <Menu Background="DodgerBlue" DockPanel.Dock="Top" DataContext="{Binding MenuVm}">
             <MenuItem Header="_端口" Foreground="White">
-                <MenuItem Header="_打开端口" />
-                <MenuItem Header="_关闭端口" />
+                <MenuItem Header="_打开端口" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_关闭端口" Command="{Binding CloseCommand}"/>
                 <MenuItem Header="_退出" Command="{Binding ExitCommand}" />
             </MenuItem>
         </Menu>
@@ -42,9 +42,9 @@
             </Grid.ColumnDefinitions>
 
             <!-- 左边属性区 -->
-            <Grid Margin="10,10,5,10" Grid.RowDefinitions="Auto,*">
+            <Grid Margin="10,10,5,10" RowDefinitions="Auto,*">
                 <!-- 端口操作区 -->
-                <Border Padding="10" Background="AliceBlue" Grid.Column="0" BorderBrush="Lavender" BorderThickness="1"
+                <Border Padding="10" Grid.Column="0" BorderBrush="Lavender" BorderThickness="1"
                         CornerRadius="10">
                     <ContentControl Content="{Binding ContentVm}">
                         <ContentControl.ContentTemplate>
@@ -108,8 +108,8 @@
                     <TabItem Header="卡片读取">
                         <views:ReadView DataContext="{Binding ContentVm}"></views:ReadView>
                     </TabItem>
-                    <TabItem Header="小号判断">
-                        <views:SettingView DataContext="{Binding ContentVm}"></views:SettingView>
+                    <TabItem Header="系统设置">
+                        <views:SettingView  DataContext="{Binding SettingsVm}"/>
                     </TabItem>
                 </TabControl>
 

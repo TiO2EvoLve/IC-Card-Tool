@@ -3,6 +3,37 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:D8_Demo.ViewModels"
+             x:DataType="vm:SettingsViewModel"
+             xmlns:u="https://irihi.tech/ursa"
              x:Class="D8_Demo.Views.SettingView">
-    <TextBlock Text="这是设置" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+    <Design.DataContext>
+        <vm:SettingsViewModel />
+    </Design.DataContext>
+
+    <StackPanel Margin="20" Spacing="10">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="主题" FontWeight="Bold" />
+            <ComboBox ItemsSource="{Binding Themes}"
+                      SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="窗口大小" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
+            <TextBlock Text="长" VerticalAlignment="Center"></TextBlock>
+            <TextBox Text="800" VerticalAlignment="Center"></TextBox>
+            <TextBlock Text="高" VerticalAlignment="Center"></TextBlock>
+            <TextBox Text="1920" VerticalAlignment="Center"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <!-- 通过 $parent 取得祖先 Window 作为 CommandParameter（Avalonia 支持 $parent 语法）-->
+            <Button Content="保存" Command="{Binding SaveCommand}"
+                    CommandParameter="{Binding $parent[Window]}" />
+            <Button Content="重置" Theme="{DynamicResource BorderlessButton}" Classes="Warning"
+                    Command="{Binding ResetCommand}"
+                    CommandParameter="{Binding $parent[Window]}" />
+        </StackPanel>
+    </StackPanel>
+
 </UserControl>

@@ -5,7 +5,8 @@ namespace D8_Demo.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public MenuViewModel MenuVm { get; }= new();
-    public ContentViewModel ContentVm { get; }= new();
+    public MenuViewModel MenuVm { get; } = new();
+    public ContentViewModel ContentVm { get; } = ContentViewModel.Instance;
+    public SettingsViewModel SettingsVm { get; }= SettingsViewModel.Instance;
     
 }
