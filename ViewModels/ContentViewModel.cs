@@ -20,6 +20,7 @@ namespace D8_Demo.ViewModels;
 
 public partial class ContentViewModel : ViewModelBase
 {
+    #region 导入DLL
     [DllImport("dcrf32.dll")] private static extern int dc_init(short port, int baud);//打开端口
     [DllImport("dcrf32.dll")] private static extern int dc_exit(int icdev);//关闭端口
     [DllImport("dcrf32.dll")] private static extern short dc_getname(int icdev, StringBuilder name);//获取设备名
@@ -29,7 +30,7 @@ public partial class ContentViewModel : ViewModelBase
     [DllImport("dcrf32.dll")] private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff);//复位
     [DllImport("dcrf32.dll")] private static extern short dc_request(int icdev, int mode, ref short TagType);
     [DllImport("dcrf32.dll")] private static extern short dc_reset(int icdev, int Msec);
-    
+    #endregion
     //端口号
     [ObservableProperty] private int port = 100;
     //波特率
@@ -63,14 +64,18 @@ public partial class ContentViewModel : ViewModelBase
     private bool isConnected ;
     //卡号
     [ObservableProperty]private long sn;
-
+    
     [ObservableProperty] private bool isChecked = true;
     //卡片列表
     public ObservableCollection<Card> Cards { get; set; } = new();
-
-    private ContentViewModel() { }
+    //读卡间隔
+    public int ReadTime;
+    //是否蜂鸣
+    public bool BeepSound = true;
+    //TODO : 发布时改为私有
+    public ContentViewModel() { }
     public static ContentViewModel Instance { get; } = new ();
-    //打开端口
+    #region 打开端口
     [RelayCommand]
     public async Task OpenPort()
     {
@@ -83,7 +88,7 @@ public partial class ContentViewModel : ViewModelBase
             }else {
                 Color = Brushes.LimeGreen;
                 isConnected = true;//记录端口打开成功
-                //dc_beep(icdev, 10);//蜂鸣
+                if(BeepSound) dc_beep(icdev, 10);//蜂鸣
             }
         }catch (DllNotFoundException)
         {
@@ -94,7 +99,8 @@ public partial class ContentViewModel : ViewModelBase
         
 
     }
-
+    #endregion
+    #region 获取设备信息
     private void GetContent()
     {
         //获取设备名
@@ -110,7 +116,8 @@ public partial class ContentViewModel : ViewModelBase
             FirmwareVersion = ver.ToString();
         }
     }
-    //关闭端口
+    #endregion
+    #region 关闭端口
     [RelayCommand]
     public async Task ClosePort()
     {
@@ -118,13 +125,14 @@ public partial class ContentViewModel : ViewModelBase
         {
             Color = Brushes.Red;
             isConnected = false;
+            if(BeepSound) dc_beep(icdev, 10);//蜂鸣
         }else
         {
             await MessageBoxManager.GetMessageBoxStandard("失败", "关闭端口失败").ShowAsync();
         }
-        
     }
-    //读卡
+    #endregion 
+    #region 读卡
     [RelayCommand]
     private async Task ReadCard()
     {
@@ -185,6 +193,9 @@ public partial class ContentViewModel : ViewModelBase
                 Status = State.同一张卡;
                 Thread.Sleep(500);
                 continue;
+            }else if(BeepSound) 
+            { 
+                dc_beep(icdev, 10);//蜂鸣
             }
             uid = CardUid;
             //判断是否已经有该数据
@@ -221,15 +232,18 @@ public partial class ContentViewModel : ViewModelBase
                     
                 });
             }
-            Thread.Sleep(2000);
+            Thread.Sleep(ReadTime);
         }
     }
-
+    #endregion
+    #region 清除列表
     [RelayCommand]
     private void ClearCards()
     {
         Cards.Clear();
     }
+    #endregion
+    #region 保存数据
     [RelayCommand]
     private async Task SaveData()
     {
@@ -247,10 +261,10 @@ public partial class ContentViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            await MessageBoxManager.GetMessageBoxStandard("异常", ex.Message).ShowAsync();
             return;
         }
         //保存数据到数据库
-        // 保存数据到数据库
         var sqls = new List<string>();
 
         // 先清空表
@@ -263,7 +277,6 @@ public partial class ContentViewModel : ViewModelBase
         VALUES ('{card.SN}', '{card.ATS}', '{card.UID16}', '{card.UID16_}', '{card.UID10}', '{card.UID10_}', #{card.Time:yyyy-MM-dd HH:mm:ss}#)";
             sqls.Add(sql);
         }
-
         try
         {
             await Task.Run(() => Mdb.ExecuteBatch(destinationFilePath, sqls));
@@ -274,9 +287,6 @@ public partial class ContentViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("失败", $"保存失败：{ex.Message}").ShowAsync();
         }
     }
-
-   
-    
-    
+    #endregion
 }
    

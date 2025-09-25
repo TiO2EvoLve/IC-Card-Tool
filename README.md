@@ -19,3 +19,8 @@
 - .Net 9.0 以上
 - Window 10 以上
 - RAM > 4 GB
+
+## 注意事项
+
+- 如果需要保存数据库功能，需额外安装Access Database Engine。
+- 本程序默认支持64位计算机，32位计算机需自行更换32位的dcrf32.dll。
