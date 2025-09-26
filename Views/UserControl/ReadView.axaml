@@ -5,7 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:ContentViewModel"
-             x:Class="D8_Demo.Views.ReadView">
+             x:Class="D8_Demo.Views.UserControl.ReadView">
     
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,

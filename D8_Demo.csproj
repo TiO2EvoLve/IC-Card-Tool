@@ -32,6 +32,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
         <PackageReference Include="Semi.Avalonia" Version="11.2.1.9" />
         <PackageReference Include="System.Data.OleDb" Version="9.0.9" />
+        <PackageReference Include="Tommy" Version="3.1.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,6 +44,12 @@
       </None>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Config\error.toml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Config\ChipType.toml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

@@ -9,4 +9,5 @@ public partial class MainWindowViewModel : ViewModelBase
     public ContentViewModel ContentVm { get; } = ContentViewModel.Instance;
     public SettingsViewModel SettingsVm { get; }= SettingsViewModel.Instance;
     
+    public CardCheckViewModel CardCheckVm { get; } = new();
 }

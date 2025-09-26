@@ -1,0 +1,33 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:D8_Demo.ViewModels"
+             x:DataType="vm:CardCheckViewModel"
+             x:Class="D8_Demo.Views.UserControl.CardCheckView">
+    <Design.DataContext>
+        <vm:CardCheckViewModel />
+    </Design.DataContext>
+    
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <StackPanel VerticalAlignment="Center" Spacing="20">
+            <Button Command="{Binding CheckChipTypeCommand}">测试</Button>
+            
+        </StackPanel>
+        <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="卡返回值：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            <TextBox MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="复位信息：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="4" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green" FontWeight="Bold" MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}" Content="{Binding CardType}" ></Label>
+        </StackPanel>
+        
+    </Grid>
+   
+</UserControl>

@@ -1,10 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿
+namespace D8_Demo.Views.UserControl;
 
-namespace D8_Demo.Views;
-
-public partial class SettingView : UserControl
+public partial class SettingView : Avalonia.Controls.UserControl
 {
     public SettingView()
     {

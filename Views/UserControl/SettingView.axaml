@@ -6,7 +6,7 @@
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:SettingsViewModel"
              xmlns:u="https://irihi.tech/ursa"
-             x:Class="D8_Demo.Views.SettingView">
+             x:Class="D8_Demo.Views.UserControl.SettingView">
 
     <Design.DataContext>
         <vm:SettingsViewModel />

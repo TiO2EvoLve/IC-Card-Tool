@@ -28,8 +28,8 @@ public partial class ContentViewModel : ViewModelBase
     [DllImport("dcrf32.dll")] private static extern short dc_beep(int icdev, uint _Msec);//蜂鸣
     [DllImport("dcrf32.dll")] private static extern int dc_card(int icdev, int mode, ref ulong snr);// 寻卡
     [DllImport("dcrf32.dll")] private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff);//复位
-    [DllImport("dcrf32.dll")] private static extern short dc_request(int icdev, int mode, ref short TagType);
-    [DllImport("dcrf32.dll")] private static extern short dc_reset(int icdev, int Msec);
+    [DllImport("dcrf32.dll")] private static extern short dc_reset(int icdev, int Msec);//复位
+
     #endregion
     //端口号
     [ObservableProperty] private int port = 100;
@@ -59,7 +59,7 @@ public partial class ContentViewModel : ViewModelBase
     //选中的波特率
     [ObservableProperty] private string? selectedOption = "115200";
     //设备标识符
-    private int icdev;
+    public int icdev;
     //是否已连接
     private bool isConnected ;
     //卡号
