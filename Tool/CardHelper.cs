@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Text;
 using D8_Demo.ViewModels;
-using MsBox.Avalonia;
+
 
 namespace D8_Demo.Tool;
 
@@ -13,7 +13,10 @@ public class CardHelper
     [DllImport("dcrf32.dll")] private static extern short dc_reset(int icdev, int Msec);//复位
     [DllImport("dcrf32.dll")] private static extern int dc_card(int icdev, int mode, ref ulong snr);// 寻卡
     [DllImport("dcrf32.dll")] private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff);//复位
-    [DllImport("dcrf32.dll")] private static extern short dc_request(int icdev, int mode, ref uint TagType);
+    [DllImport("dcrf32.dll")] private static extern short dc_request(int icdev, char mode, ref ushort TagType);
+    [DllImport("dcrf32.dll")] private static extern short dc_select(int icdev, Int32 Snr, [Out] byte[] Size);
+    [DllImport("dcrf32.dll")] private static extern short dc_anticoll(int icdev,uint Mode,ref ulong Snr);
+    
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
     
     int icdev => CVM.icdev; 
@@ -45,15 +48,21 @@ public class CardHelper
 
         return true;
     }
-    public bool ResetHex()
+    public string ResetHex()
     {
         byte crlen = 1;
         var recbuff = new byte[100];
         if (dc_pro_resethex(icdev, ref crlen, ref recbuff[0]) != 0)
         {
-            return false;
+            return "";
         }
-        return true;
+        string num = "";
+        foreach (var t in recbuff)
+        {
+            num += (char)t;
+        }
+        return num.Replace("\0", "");
+        
     }
     public bool FindCard()
     {
@@ -62,8 +71,38 @@ public class CardHelper
     }
     public string Request()
     {
-        uint TagType = 0;
-        if (dc_request(icdev, 0x00, ref TagType) != 0) return "";
-        return TagType.ToString("X");
+        ushort TagType = 0;
+        Reset();
+        var st = dc_request(icdev, '1', ref TagType);
+        if (st != 0) return "";
+        return TagType.ToString();
+    }
+
+    public string Select(string uid)
+    {
+        Int32 i = Int32.Parse(uid, System.Globalization.NumberStyles.HexNumber);
+        byte[] sdata = new byte[1];
+        int st = dc_select(icdev, i, sdata);
+        if (st != 0)
+        {
+            return "";
+        }
+        StringBuilder sber = new StringBuilder();
+        foreach (byte b in sdata)
+        {
+            sber.Append(b > 15 ? Convert.ToString(b, 16) : '0' + Convert.ToString(b, 16));
+        }
+        string data_r = sber.ToString();
+        return (data_r);
+    }
+    public string Anticoll()
+    {
+        ulong Snr = 0;
+        int st = dc_anticoll(icdev, 0x00, ref Snr);
+        if (st != 0)
+        {
+            return "";
+        }
+        return Snr.ToString("X").PadLeft(8,'0');
     }
 }

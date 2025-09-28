@@ -1,0 +1,152 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             xmlns:vm="using:D8_Demo.ViewModels"
+             x:DataType="vm:M1ReadViewModel"
+             x:Class="D8_Demo.Views.UserControl.M1ReadView">
+    <Design.DataContext>
+        <vm:M1ReadViewModel />
+    </Design.DataContext>
+    
+    <Grid RowDefinitions="Auto,Auto" Margin="20">
+        <StackPanel>
+            <Button >读卡</Button>
+        </StackPanel>
+        
+        <Grid RowSpacing="10" ColumnSpacing="10" ShowGridLines="False" Grid.Row="1" Margin="0,20,0,0" RowDefinitions="*,*,*,*" ColumnDefinitions="*,*,*,*" >
+            <StackPanel Spacing="5">
+                <TextBlock HorizontalAlignment="Center">0扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">1扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="2" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">2扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="3" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">3扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">4扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">5扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="2" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">6扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="3" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">7扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="2" Grid.Column="0" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">8扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">9扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="2" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">10扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="3" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">11扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="0" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">12扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="1" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">13扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="2" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">14扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="3" Spacing="5">
+                <TextBlock HorizontalAlignment="Center">15扇区</TextBlock>
+                <TextBox MinHeight="80"></TextBox>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <Button >读取</Button>
+                    <Button >写入</Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+    
+</UserControl>

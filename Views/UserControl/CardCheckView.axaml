@@ -24,6 +24,13 @@
             <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
         </StackPanel>
         
+        <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" >
+            <TextBlock Text="特征值1：" VerticalAlignment="Center"></TextBlock>
+            <TextBox Text="{Binding Feature1}" IsReadOnly="True" MinWidth="100"></TextBox>
+            <TextBlock Text="特征值2：" VerticalAlignment="Center"></TextBlock>
+            <TextBox Text="{Binding Feature2}" IsReadOnly="True" MinWidth="100"></TextBox>
+        </StackPanel>
+        
         <StackPanel Grid.Row="4" HorizontalAlignment="Center" Margin="0,20,0,0">
             <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green" FontWeight="Bold" MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}" Content="{Binding CardType}" ></Label>
         </StackPanel>

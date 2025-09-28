@@ -61,7 +61,7 @@ public partial class ContentViewModel : ViewModelBase
     //设备标识符
     public int icdev;
     //是否已连接
-    private bool isConnected ;
+    public bool isConnected ;
     //卡号
     [ObservableProperty]private long sn;
     
@@ -72,7 +72,9 @@ public partial class ContentViewModel : ViewModelBase
     public int ReadTime;
     //是否蜂鸣
     public bool BeepSound = true;
-    //TODO : 发布时改为私有
+    //是否可以运行
+    public bool CanRun = true;
+    //TODO :发布时改为私有
     public ContentViewModel() { }
     public static ContentViewModel Instance { get; } = new ();
     #region 打开端口
@@ -144,6 +146,11 @@ public partial class ContentViewModel : ViewModelBase
         ulong uid = 0;//记录上次读的卡片
         while (true)
         {
+            if(!CanRun){
+                Clear();
+                Status = State.等待读取;
+                break; // 如果不可以运行，跳出循环
+            }
             if (!isConnected) break; // 如果端口关闭，跳出循环
             if (dc_reset(icdev, 2) != 0)
             {
@@ -161,13 +168,7 @@ public partial class ContentViewModel : ViewModelBase
                 Uid10 = Convert.ToUInt32(Uid16, 16).ToString();
             }else
             {
-                FindCard = Brushes.Red;
-                Uid10 = "";
-                Uid10_ = "";
-                Uid16 = "";
-                Uid16_ = "";
-                Ats = "";
-                Status = State.等待放卡;
+                Clear();
                 continue;
             }
             //取ATS
@@ -177,7 +178,6 @@ public partial class ContentViewModel : ViewModelBase
             {
                 Status = State.非CPU卡;
                 Ats = "非CPU卡";
-                Thread.Sleep(500);
                 continue;
             }
             string num = "";
@@ -192,7 +192,6 @@ public partial class ContentViewModel : ViewModelBase
             {
                 Status = State.同一张卡;
                 Thread.Sleep(500);
-                continue;
             }else if(BeepSound) 
             { 
                 dc_beep(icdev, 10);//蜂鸣
@@ -288,5 +287,15 @@ public partial class ContentViewModel : ViewModelBase
         }
     }
     #endregion
+    void Clear()
+    {
+        FindCard = Brushes.Red;
+        Uid10 = "";
+        Uid10_ = "";
+        Uid16 = "";
+        Uid16_ = "";
+        Ats = "";
+        Status = State.等待放卡;
+    }
 }
    

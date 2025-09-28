@@ -101,16 +101,21 @@
 
 
             <!-- 可拖动分割条 -->
-            <GridSplitter Grid.Column="1" ShowsPreview="False" />
+            <GridSplitter Grid.Column="1" Background="Transparent"/>
 
             <!-- 右边主内容区 -->
             <Border Margin="5,10,10,10" Grid.Column="2" BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
-                <TabControl TabStripPlacement="Top" Margin="10">
+                <TabControl 
+                    SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                    TabStripPlacement="Top" Margin="10">
                     <TabItem Header="卡片读取">
                         <userControl:ReadView DataContext="{Binding ContentVm}"></userControl:ReadView>
                     </TabItem>
                     <TabItem Header="小号判断">
                         <userControl:CardCheckView  DataContext="{Binding CardCheckVm}"></userControl:CardCheckView>
+                    </TabItem>
+                    <TabItem Header="M1读写">
+                        <userControl:M1ReadView  DataContext="{Binding M1ReadVm}"/>
                     </TabItem>
                     <TabItem Header="系统设置">
                         <userControl:SettingView  DataContext="{Binding SettingsVm}"/>

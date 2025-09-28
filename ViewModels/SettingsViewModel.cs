@@ -18,6 +18,7 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private int sleepTime;
     [ObservableProperty] private bool sound;
     ContentViewModel contentViewModel => ContentViewModel.Instance;
+    CardCheckViewModel cardCheckViewModel => CardCheckViewModel.Instance;
     public string[] Themes { get; } = ["Light", "Dark","Default"];
 
     public SettingsViewModel()
@@ -25,6 +26,7 @@ public partial class SettingsViewModel : ViewModelBase
         // 加载现有配置
         SelectedTheme = SettingsManage.Settings.Theme;//加载主题
         contentViewModel.ReadTime = SettingsManage.Settings.SleepTime;//设置读卡间隔
+        cardCheckViewModel.ReadTime = SettingsManage.Settings.SleepTime;//设置读卡间隔
         SleepTime = contentViewModel.ReadTime;//设置读卡间隔
         Sound = SettingsManage.Settings.Sound;//设置是否开启声音
         contentViewModel.BeepSound = Sound;//设置是否开启声音
@@ -40,8 +42,8 @@ public partial class SettingsViewModel : ViewModelBase
         SettingsManage.Settings.SleepTime = SleepTime;//设置读卡间隔
         SettingsManage.Settings.Sound = Sound;
         contentViewModel.ReadTime = SleepTime;//设置读卡间隔
+        cardCheckViewModel.ReadTime = SleepTime;//设置读卡间隔
         contentViewModel.BeepSound = Sound;//设置是否开启声音
-        Console.WriteLine(contentViewModel.BeepSound);
         SettingsManage.Save();
         SetTheme(SelectedTheme);
         await MessageBoxManager.GetMessageBoxStandard("成功", "保存成功").ShowAsync();
