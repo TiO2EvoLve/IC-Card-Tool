@@ -11,8 +11,14 @@
     </Design.DataContext>
 
 
-    <Grid Margin="20">
-        <ItemsControl ItemsSource="{Binding Sectors}">
+    <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="10">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
+            <TextBox Width="200" Text="{Binding Index}" />
+            <Button Command="{Binding ReadCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
+            <Button Classes="Secondary">写入</Button>
+        </StackPanel>
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Sectors}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <!-- 用 UniformGrid 来自动布局 -->
@@ -22,13 +28,16 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid RowDefinitions="Auto,*">
-                        <TextBlock  HorizontalAlignment="Center" Text="{Binding Title}" />
-                        <TextBox Grid.Row="1" VerticalAlignment="Stretch" Text="{Binding Content}" />
+                    <Grid RowDefinitions="Auto,*" RowSpacing="5" Margin="0,20,0,0">
+                        <Label Classes="Ghost Blue"  Theme="{DynamicResource TagLabel}" HorizontalAlignment="Center" Content="{Binding Title}" />
+                        <Viewbox Grid.Row="1" Stretch="Uniform">
+                        <TextBox MinWidth="50" HorizontalContentAlignment="Center" VerticalAlignment="Stretch"  Text="{Binding Content}" TextWrapping="WrapWithOverflow" />
+                        </Viewbox>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        
     </Grid>
 
 

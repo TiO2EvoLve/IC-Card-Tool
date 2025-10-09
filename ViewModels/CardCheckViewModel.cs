@@ -76,6 +76,7 @@ public partial class CardCheckViewModel : ViewModelBase
             if (ats == "")
             {
                 //为M1卡或UL卡
+                CardType = "M1卡或UL卡";
                 continue;
             }
             ATS = ats;

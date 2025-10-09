@@ -178,6 +178,7 @@ public partial class ContentViewModel : ViewModelBase
             {
                 Status = State.非CPU卡;
                 Ats = "非CPU卡";
+                Thread.Sleep(500);
                 continue;
             }
             string num = "";
