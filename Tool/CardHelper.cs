@@ -18,7 +18,7 @@ public class CardHelper
     private static extern short dc_reset(int icdev, uint sec); //复位
 
     [DllImport("dcrf32.dll")]
-    private static extern short dc_card(int icdev, char _Mode, ref ulong Snr);
+    private static extern short dc_card(int icdev, char _Mode, ref ulong Snr);//寻卡
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff); //复位
@@ -32,13 +32,11 @@ public class CardHelper
     [DllImport("dcrf32.dll")]
     private static extern short dc_anticoll(int icdev, uint Mode, ref ulong Snr); //获取芯片号
     [DllImport("dcrf32.dll")]
-    public static extern int dc_load_key(int icdev, int mode, int secnr, [In] byte[] nkey);  //密码装载到读写模块中
+    private static extern int dc_load_key(int icdev, int mode, int secnr, [In] byte[] nkey);  //密码装载到读写模块中
     [DllImport("dcrf32.dll")]
     private static extern short dc_authentication_passaddr(int icdev, byte _Mode,byte _Addr, [In]byte[] passbuff);//M1密码验证
     [DllImport("dcrf32.dll")]
-    public static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata);  //M1读扇区
-    [DllImport("dcrf32.dll")]
-    private static extern int dc_read_hex(int icdev, int adr, [Out] byte[] sdata);//M1读扇区
+    private static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata);  //M1读扇区
     [DllImport("dcrf32.dll")]
     private static extern int dc_write(int icdev, int _Adr, byte[] _Data);//M1写扇区
 

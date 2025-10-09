@@ -16,5 +16,9 @@ public partial class SectorViewModel : ViewModelBase
     {
         Title = $"{index}扇区";
     }
-    
+    [RelayCommand]
+    private void OnEdit()
+    {
+        
+    }
 }

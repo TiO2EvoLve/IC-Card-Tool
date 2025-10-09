@@ -46,7 +46,7 @@ public partial class SettingsViewModel : ViewModelBase
         contentViewModel.BeepSound = Sound;//设置是否开启声音
         SettingsManage.Save();
         SetTheme(SelectedTheme);
-        await MessageBoxManager.GetMessageBoxStandard("成功", "保存成功").ShowAsync();
+        //await MessageBoxManager.GetMessageBoxStandard("成功", "保存成功").ShowAsync();
     }
 
     [RelayCommand]

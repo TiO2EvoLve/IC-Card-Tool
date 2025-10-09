@@ -28,11 +28,25 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid RowDefinitions="Auto,*" RowSpacing="5" Margin="0,20,0,0">
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="5" Margin="0,20,0,0">
                         <Label Classes="Ghost Blue"  Theme="{DynamicResource TagLabel}" HorizontalAlignment="Center" Content="{Binding Title}" />
                         <Viewbox Grid.Row="1" Stretch="Uniform">
-                        <TextBox MinWidth="50" HorizontalContentAlignment="Center" VerticalAlignment="Stretch"  Text="{Binding Content}" TextWrapping="WrapWithOverflow" />
+                            <TextBox Focusable="False"
+                                     CaretBrush="Transparent"
+                                     Cursor="Arrow" Padding="10" IsReadOnly="True" AcceptsReturn="True" FontFamily="Consolas, Courier New, monospace" MinWidth="100" VerticalAlignment="Stretch" Text="{Binding Content}" TextWrapping="WrapWithOverflow" />
                         </Viewbox>
+                        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0"
+                                    Classes="Primary"
+                                    Theme="{DynamicResource SolidButton}"
+                                    HorizontalAlignment="Stretch"
+                                    Content="修改"
+                                    Command="{Binding EditCommand}"/>
+                            <Button Grid.Column="1"
+                                    Classes="Warning"
+                                    HorizontalAlignment="Stretch"
+                                    Content="修改密钥"/>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
