@@ -14,7 +14,7 @@
     <Grid Margin="20" RowDefinitions="Auto,*" RowSpacing="10">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
-            <TextBox Width="200" Text="{Binding Index}" />
+            <TextBox Width="200" Text="{Binding PassWorld}" />
             <Button Command="{Binding ReadCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
             <Button Classes="Secondary">写入</Button>
         </StackPanel>
@@ -22,31 +22,29 @@
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <!-- 用 UniformGrid 来自动布局 -->
-                    <UniformGrid Rows="4" Columns="4" ColumnSpacing="10" RowSpacing="10"/>
+                    <UniformGrid  Margin="20" Rows="4" Columns="4" ColumnSpacing="10" RowSpacing="10"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="5" Margin="0,20,0,0">
-                        <Label Classes="Ghost Blue"  Theme="{DynamicResource TagLabel}" HorizontalAlignment="Center" Content="{Binding Title}" />
-                        <Viewbox Grid.Row="1" Stretch="Uniform">
-                            <TextBox Focusable="False"
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <Label Classes="Ghost Blue"
+                               Theme="{DynamicResource TagLabel}"
+                               HorizontalAlignment="Center"
+                               Content="{Binding Title}" />
+                        <Border Grid.Row="1" Background="#F7F7F7" Margin="0,10,0,0">
+                            <TextBox HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch"
+                                     HorizontalContentAlignment="Center"
                                      CaretBrush="Transparent"
-                                     Cursor="Arrow" Padding="10" IsReadOnly="True" AcceptsReturn="True" FontFamily="Consolas, Courier New, monospace" MinWidth="100" VerticalAlignment="Stretch" Text="{Binding Content}" TextWrapping="WrapWithOverflow" />
-                        </Viewbox>
-                        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
-                            <Button Grid.Column="0"
-                                    Classes="Primary"
-                                    Theme="{DynamicResource SolidButton}"
-                                    HorizontalAlignment="Stretch"
-                                    Content="修改"
-                                    Command="{Binding EditCommand}"/>
-                            <Button Grid.Column="1"
-                                    Classes="Warning"
-                                    HorizontalAlignment="Stretch"
-                                    Content="修改密钥"/>
-                        </Grid>
+                                     Cursor="Arrow"
+                                     LineHeight = "20"
+                                     AcceptsReturn="True"
+                                     FontFamily="Consolas, Courier New, monospace"
+                                     Text="{Binding Content}"/>
+                        </Border>
+                        <Button Grid.Row="2" Margin="0,5,5,5" HorizontalAlignment="Stretch" Theme="{DynamicResource SolidButton}">修改</Button>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

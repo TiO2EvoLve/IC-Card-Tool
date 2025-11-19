@@ -13,6 +13,7 @@ namespace D8_Demo.ViewModels;
 public partial class M1ReadViewModel : ViewModelBase
 {
     [ObservableProperty] private byte index = 0;
+    [ObservableProperty] private string passWorld = "FFFFFFFFFFFFFFFF";
     public static M1ReadViewModel Instance { get; } = new();
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();

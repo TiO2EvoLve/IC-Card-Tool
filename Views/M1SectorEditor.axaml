@@ -1,0 +1,24 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="600" 
+        Height="300" Width="600"
+        WindowStartupLocation="CenterScreen"
+        x:Class="D8_Demo.Views.M1SectorEditor">
+    
+    <Grid Margin="20" RowDefinitions="*,Auto,Auto,Auto,Auto,Auto" RowSpacing="10">
+       <TextBlock  
+           Text="扇区0"
+                  HorizontalAlignment="Center" 
+                  FontSize="16"/>
+       <TextBox Grid.Row="1" ></TextBox>
+       <TextBox Grid.Row="2"></TextBox>
+       <TextBox Grid.Row="3"></TextBox>
+       <TextBox Grid.Row="4"></TextBox>
+       <Button Grid.Row="5" Content="保存" 
+               HorizontalAlignment="Center"
+               Margin="0,10,0,0"
+               Width="100"/>
+   </Grid>
+</Window>
