@@ -13,13 +13,12 @@ namespace D8_Demo.ViewModels;
 public partial class M1ReadViewModel : ViewModelBase
 {
     [ObservableProperty] private byte index = 0;
-    [ObservableProperty] private string passWorld = "FFFFFFFFFFFFFFFF";
+    [ObservableProperty] private string passWorld = "FFFFFFFFFFFF";
     public static M1ReadViewModel Instance { get; } = new();
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
-
-    // 假设你有一个 CardHelper 实例，需先创建实例
-    private readonly CardHelper CardHelper = new();
+    
+    private readonly CardHelper CardHelper = CardHelper.Instance;
 
     public M1ReadViewModel()
     {
@@ -37,39 +36,32 @@ public partial class M1ReadViewModel : ViewModelBase
 
     private async Task M1ReadSector()
     {
-        if (!CVM.isConnected)
+        if (!CardHelper.isConnected)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
             return;
         }
 
         CardHelper.Reset();
-        if (!CardHelper.FindCard())
+        if (CardHelper.FindCard() ==0)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "寻卡失败").ShowAsync();
             return;
         }
         string content = "";
         //验证卡密码
-        byte[] password = new byte[7];
-        password[0] = 0xff;
-        password[1] = 0xff;
-        password[2] = 0xff;
-        password[3] = 0xff;
-        password[4] = 0xff;
-        password[5] = 0xff;
-        password[6] = 0xff;
+        
         for (byte i = 0; i < 16; i++)
         {
             for (byte j = 0; j < 4; j++)
             {
-                if (CardHelper.AuthenticationPass(0x00, (byte)(4 * i + j), password))
+                if (CardHelper.AuthenticationPass(0x00, (byte)(4 * i + j), PassWorld))
                 {
                     content =content + CardHelper.M1ReadSector((byte)(4 * i + j)).Substring(0,32) + "\n";
                 }
                 else
                 {
-                    content = "密码验证失败";
+                    content = "密码错误";
                 }
             }
             Sectors[i].Content = content[..^1];

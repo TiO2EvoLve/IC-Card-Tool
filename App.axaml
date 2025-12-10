@@ -17,5 +17,7 @@
         <semi:SemiTheme Locale="zh-CN" />
         <u-semi:SemiTheme Locale="zh-CN"/>
         <semi:SemiPopupAnimations />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+        <semi:AvaloniaEditSemiTheme />
     </Application.Styles>
 </Application>

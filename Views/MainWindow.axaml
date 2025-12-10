@@ -1,10 +1,9 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:D8_Demo.ViewModels"
-        xmlns:views="clr-namespace:D8_Demo.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:D8_Demo.ViewModels"
+        xmlns:AvalonEdit="using:AvaloniaEdit"
         xmlns:userControl="clr-namespace:D8_Demo.Views.UserControl"
         mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         Height="800" Width="1500"
@@ -25,8 +24,8 @@
         <!-- 顶部菜单栏 -->
         <Menu Background="DodgerBlue" DockPanel.Dock="Top" DataContext="{Binding MenuVm}">
             <MenuItem Header="_端口" Foreground="White">
-                <MenuItem Header="_打开端口" Command="{Binding OpenCommand}"/>
-                <MenuItem Header="_关闭端口" Command="{Binding CloseCommand}"/>
+                <MenuItem Header="_打开端口" Command="{Binding OpenCommand}" />
+                <MenuItem Header="_关闭端口" Command="{Binding CloseCommand}" />
                 <MenuItem Header="_退出" Command="{Binding ExitCommand}" />
             </MenuItem>
         </Menu>
@@ -47,85 +46,92 @@
                 <!-- 端口操作区 -->
                 <Border Padding="10" Grid.Column="0" BorderBrush="Lavender" BorderThickness="1"
                         CornerRadius="10">
-                    <ContentControl Content="{Binding ContentVm}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate DataType="viewModels:ContentViewModel">
-                                <Grid RowDefinitions="Auto,Auto">
-                                    <StackPanel Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"
-                                                Orientation="Horizontal" Spacing="10">
-                                        <TextBlock Text="端口号:" VerticalAlignment="Center" />
-                                        <TextBox Text="{Binding Port}" />
-                                        <TextBlock Text="波特率:" VerticalAlignment="Center" />
-                                        <ComboBox ItemsSource="{Binding Options}"
-                                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" Spacing="20">
-                                        <Button Content="打开端口" Command="{Binding OpenPortCommand}"
-                                                Theme="{DynamicResource SolidButton}" />
-                                        <Button Content="关闭端口"  Command="{Binding ClosePortCommand}"
-                                                Theme="{DynamicResource SolidButton}" Classes="Tertiary" />
-                                        <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
-                                                  Width="24" Height="24"
-                                                  Foreground="{Binding Color}" />
-                                    </StackPanel>
+                    <Grid RowDefinitions="Auto,Auto" DataContext="{Binding ContentVm}">
+                        <StackPanel Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"
+                                    Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="端口号:" VerticalAlignment="Center" />
+                            <TextBox Text="{Binding Port}" />
+                            <TextBlock Text="波特率:" VerticalAlignment="Center" />
+                            <ComboBox ItemsSource="{Binding Options}"
+                                      SelectedItem="{Binding SelectedOption, Mode=TwoWay}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" Spacing="20">
+                            <Button Content="打开端口" Command="{Binding OpenPortCommand}"
+                                    Theme="{DynamicResource SolidButton}" />
+                            <Button Content="关闭端口" Command="{Binding ClosePortCommand}"
+                                    Theme="{DynamicResource SolidButton}" Classes="Tertiary" />
+                            <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
+                                      Width="24" Height="24"
+                                      Foreground="{Binding Color}" />
+                        </StackPanel>
 
-                                </Grid>
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
+                    </Grid>
                 </Border>
                 <!-- 侧边栏 -->
                 <Border Grid.Row="1" Margin="0,10,0,0" Padding="10" Grid.Column="0" BorderBrush="Lavender"
                         BorderThickness="1" CornerRadius="10">
-                    <ContentControl Content="{Binding ContentVm}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate DataType="viewModels:ContentViewModel">
-                                <StackPanel Spacing="10">
-                                    <TextBlock Text="设备信息" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
-                                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                                        <TextBlock Text="设备名:" VerticalAlignment="Center"></TextBlock>
-                                        <TextBox MinWidth="100" Text="{Binding DeviceName}" VerticalAlignment="Center" IsEnabled="False"></TextBox>
-                                        <TextBlock Text="固件版本:" VerticalAlignment="Center"></TextBlock>
-                                        <TextBox MinWidth="100" Text="{Binding FirmwareVersion}" VerticalAlignment="Center" IsEnabled="False"></TextBox>
-                                    </StackPanel>
-                                    
-                                </StackPanel>
-                                
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
-
+                   
+                        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10" DataContext="{Binding ContentVm}">
+                       <TextBlock Text="设备信息" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10"
+                                    HorizontalAlignment="Center">
+                            <TextBlock Text="设备名:" VerticalAlignment="Center"></TextBlock>
+                            <TextBox MinWidth="100" Text="{Binding DeviceName}" VerticalAlignment="Center"
+                                     IsEnabled="False">
+                            </TextBox>
+                            <TextBlock Text="固件版本:" VerticalAlignment="Center"></TextBlock>
+                            <TextBox MinWidth="100" Text="{Binding FirmwareVersion}"
+                                     VerticalAlignment="Center" IsEnabled="False">
+                            </TextBox>
+                        </StackPanel>
+                        <Border Grid.Row="2" Margin="10" Padding="10" BorderThickness="1"
+                                BorderBrush="Lavender">
+                            <AvalonEdit:TextEditor Document="{Binding LogDoc}"
+                                                   x:Name="logEditor"
+                                                   HorizontalScrollBarVisibility="Auto"
+                                                   VerticalScrollBarVisibility="Visible"
+                                                   IsReadOnly="True"
+                                                   FontWeight="Light"
+                                                   Padding="20"
+                                                   Background="AliceBlue"
+                                                   FontSize="14"
+                                                   ShowLineNumbers="True"
+                                                   Watermark="暂没有日志">
+                            </AvalonEdit:TextEditor>
+                        </Border>
+                        <Button Grid.Row="3" Content="清除日志" Command="{Binding ClearLogsCommand}"
+                                Theme="{DynamicResource SolidButton}" Classes="Warning"
+                                HorizontalAlignment="Stretch" Margin="10,0,10,0" />
+                        </Grid>
+                    
                 </Border>
             </Grid>
 
 
             <!-- 可拖动分割条 -->
-            <GridSplitter Grid.Column="1" Background="Transparent"/>
+            <GridSplitter Grid.Column="1" Background="Transparent" />
 
             <!-- 右边主内容区 -->
             <Border Margin="5,10,10,10" Grid.Column="2" BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
-                <TabControl 
+                <TabControl
                     SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
                     TabStripPlacement="Top" Margin="10">
                     <TabItem Header="卡片读取">
                         <userControl:ReadView DataContext="{Binding ContentVm}"></userControl:ReadView>
                     </TabItem>
                     <TabItem Header="小号判断">
-                        <userControl:CardCheckView  DataContext="{Binding CardCheckVm}"></userControl:CardCheckView>
+                        <userControl:CardCheckView DataContext="{Binding CardCheckVm}"></userControl:CardCheckView>
                     </TabItem>
                     <TabItem Header="M1读写">
-                        <userControl:M1ReadView  DataContext="{Binding M1ReadVm}"/>
+                        <userControl:M1ReadView DataContext="{Binding M1ReadVm}" />
                     </TabItem>
                     <TabItem Header="系统设置">
-                        <userControl:SettingView  DataContext="{Binding SettingsVm}"/>
+                        <userControl:SettingView DataContext="{Binding SettingsVm}" />
                     </TabItem>
-                    
+
                 </TabControl>
-
             </Border>
-
-
         </Grid>
     </DockPanel>
 

@@ -15,7 +15,8 @@
     
     <Grid Margin="20" RowDefinitions="Auto,Auto,*"  >
         <StackPanel Margin="20" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-            <TextBox Width="200"></TextBox>
+            <TextBlock Text="卡号：" VerticalAlignment="Center"></TextBlock>
+            <TextBox MinLines="1" Text="{Binding Sn}" MinWidth="200"></TextBox>
             <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
                       Width="24" Height="24"
                       Foreground="{Binding FindCard}" />
@@ -38,7 +39,7 @@
                 </StackPanel>
                 <StackPanel Margin="0,30,0,0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                     <TextBlock VerticalAlignment="Center">ATS：</TextBlock>
-                    <TextBox MinWidth="600" Text="{Binding Ats}"></TextBox>
+                    <TextBox MinWidth="300" Text="{Binding Ats}"></TextBox>
                 </StackPanel>
             </Grid>
         </Border>
@@ -50,7 +51,7 @@
                         <ToggleSwitch IsChecked="{Binding IsChecked}" Theme="{DynamicResource SimpleToggleSwitch}"/>
                         <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding IsChecked}">
                             <TextBlock Text="下张卡号 :" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                            <TextBox Text="{Binding Sn}" MinWidth="200"></TextBox>
+                            <TextBox IsReadOnly="True" Text="{Binding Sn}" MinWidth="200"></TextBox>
                             <Button Command="{Binding SaveDataCommand}" Theme="{DynamicResource SolidButton}" >保存</Button>
                             <Button Command="{Binding ClearCardsCommand}" Theme="{DynamicResource SolidButton}" Classes="Warning" >清空</Button>
                         </StackPanel>

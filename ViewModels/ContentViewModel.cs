@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Threading;
+using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Enum;
@@ -20,17 +19,6 @@ namespace D8_Demo.ViewModels;
 
 public partial class ContentViewModel : ViewModelBase
 {
-    #region 导入DLL
-    [DllImport("dcrf32.dll")] private static extern int dc_init(short port, int baud);//打开端口
-    [DllImport("dcrf32.dll")] private static extern int dc_exit(int icdev);//关闭端口
-    [DllImport("dcrf32.dll")] private static extern short dc_getname(int icdev, StringBuilder name);//获取设备名
-    [DllImport("dcrf32.dll")] private static extern short dc_getver(int icdev, StringBuilder sver);//获取设备名
-    [DllImport("dcrf32.dll")] private static extern short dc_beep(int icdev, uint _Msec);//蜂鸣
-    [DllImport("dcrf32.dll")] private static extern int dc_card(int icdev, int mode, ref ulong snr);// 寻卡
-    [DllImport("dcrf32.dll")] private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff);//复位
-    [DllImport("dcrf32.dll")] private static extern short dc_reset(int icdev, int Msec);//复位
-
-    #endregion
     //端口号
     [ObservableProperty] private int port = 100;
     //波特率
@@ -58,13 +46,9 @@ public partial class ContentViewModel : ViewModelBase
     ];
     //选中的波特率
     [ObservableProperty] private string? selectedOption = "115200";
-    //设备标识符
-    public int icdev;
-    //是否已连接
-    public bool isConnected ;
-    //卡号
-    [ObservableProperty]private long sn;
     
+    //卡号
+    [ObservableProperty]private string sn = "1";
     [ObservableProperty] private bool isChecked = true;
     //卡片列表
     public ObservableCollection<Card> Cards { get; set; } = new();
@@ -74,6 +58,10 @@ public partial class ContentViewModel : ViewModelBase
     public bool BeepSound = true;
     //是否可以运行
     public bool CanRun = true;
+    //日志内容
+    [ObservableProperty] private TextDocument logDoc = new ();
+    //卡片帮助类
+    private readonly CardHelper CardHelper = CardHelper.Instance;
     //TODO :发布时改为私有
     public ContentViewModel() { }
     public static ContentViewModel Instance { get; } = new ();
@@ -81,54 +69,38 @@ public partial class ContentViewModel : ViewModelBase
     [RelayCommand]
     public async Task OpenPort()
     {
-        if (isConnected) return;//端口已经打开，无需继续操作。
+        if (CardHelper.isConnected) return; //端口已经打开，无需继续操作。
         try
         {
-            icdev = dc_init(Convert.ToInt16(Port), 115200);
-            if (icdev < 0) {
+            if (!CardHelper.OpenPort(Convert.ToInt16(Port), 115200))
+            {
                 await MessageBoxManager.GetMessageBoxStandard("失败", "打开端口失败,请检查读卡器是否已连接").ShowAsync();
-            }else {
+            }else
+            {
                 Color = Brushes.LimeGreen;
-                isConnected = true;//记录端口打开成功
-                if(BeepSound) dc_beep(icdev, 10);//蜂鸣
+                CardHelper.Beep(BeepSound);
+                AddLog("打开端口成功！");
             }
-        }catch (DllNotFoundException)
-        {
-            await MessageBoxManager.GetMessageBoxStandard("失败", "找不到dcrf32.dll，请检查").ShowAsync();
         }
-        
-        GetContent();
-        
+        catch (DllNotFoundException)
+        {
+            await MessageBoxManager.GetMessageBoxStandard("失败", "请根据你的系统更换对应的dcrf32.dll，请检查").ShowAsync();
+        }
+        DeviceName = CardHelper.GetDeviceName();
+        FirmwareVersion = CardHelper.GetDeviceVersion();
 
-    }
-    #endregion
-    #region 获取设备信息
-    private void GetContent()
-    {
-        //获取设备名
-        StringBuilder name = new StringBuilder(64); // 分配64字节缓冲区
-        if (dc_getname(icdev, name) == 0)
-        {
-            DeviceName = name.ToString();
-        }
-        //获取版本号
-        StringBuilder ver = new StringBuilder(128); // 分配128字节缓冲
-        if (dc_getver(icdev, ver) == 0)
-        {
-            FirmwareVersion = ver.ToString();
-        }
     }
     #endregion
     #region 关闭端口
     [RelayCommand]
     public async Task ClosePort()
     {
-        if (dc_exit(icdev) == 0)
+        if (CardHelper.ClosePort())
         {
             Color = Brushes.Red;
-            isConnected = false;
-            if(BeepSound) dc_beep(icdev, 10);//蜂鸣
-        }else
+            AddLog("端口已关闭");
+        }
+        else
         {
             await MessageBoxManager.GetMessageBoxStandard("失败", "关闭端口失败").ShowAsync();
         }
@@ -138,7 +110,7 @@ public partial class ContentViewModel : ViewModelBase
     [RelayCommand]
     private async Task ReadCard()
     {
-        if (!isConnected) await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
+        if (!CardHelper.isConnected) await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
         await Task.Run(Read);
     }
     private void Read()
@@ -146,19 +118,21 @@ public partial class ContentViewModel : ViewModelBase
         ulong uid = 0;//记录上次读的卡片
         while (true)
         {
+            if (!CardHelper.isConnected) break; // 如果端口关闭，跳出循环
             if(!CanRun){
                 Clear();
                 Status = State.等待读取;
                 break; // 如果不可以运行，跳出循环
             }
-            if (!isConnected) break; // 如果端口关闭，跳出循环
-            if (dc_reset(icdev, 2) != 0)
+            if (!CardHelper.Reset()) 
             {
                 Status = State.复位异常;
+                AddLog("复位异常");
                 return;
             }
             ulong CardUid = 0;
-            if (dc_card(icdev, 0x01, ref CardUid) == 0) // 0 表示成功
+            CardUid = CardHelper.FindCard();
+            if (CardUid != 0) // 0 表示成功
             {
                 FindCard = Brushes.LimeGreen;
                 Status = State.读卡中;
@@ -166,36 +140,27 @@ public partial class ContentViewModel : ViewModelBase
                 Uid16_ = CardUid.ToString("X");
                 Uid16 = Tools.ChangeHexPairs(Uid16_);
                 Uid10 = Convert.ToUInt32(Uid16, 16).ToString();
+                AddLog($"发现卡片:{Uid16}");
             }else
             {
                 Clear();
                 continue;
             }
             //取ATS
-            byte crlen = 1;
-            var recbuff = new byte[100];
-            if (dc_pro_resethex(icdev, ref crlen, ref recbuff[0]) != 0)
+            Ats = CardHelper.ResetHex();
+            if ( Ats == "")
             {
                 Status = State.非CPU卡;
                 Ats = "非CPU卡";
                 Thread.Sleep(500);
                 continue;
             }
-            string num = "";
-            foreach (var t in recbuff)
-            {
-                num += (char)t;
-            }
-            num = num.Replace("\0", "");
-            Ats = num;
+            
             //判断是否为同一张卡
             if (uid == CardUid)
             {
                 Status = State.同一张卡;
                 Thread.Sleep(500);
-            }else if(BeepSound) 
-            { 
-                dc_beep(icdev, 10);//蜂鸣
             }
             uid = CardUid;
             //判断是否已经有该数据
@@ -215,7 +180,7 @@ public partial class ContentViewModel : ViewModelBase
                             ATS = Ats,
                             Time = DateTime.Now
                         });
-                        Sn++;
+                        Sn = (Convert.ToInt32(Sn) + 1).ToString();
                     }
                     else
                     {
@@ -297,6 +262,18 @@ public partial class ContentViewModel : ViewModelBase
         Uid16_ = "";
         Ats = "";
         Status = State.等待放卡;
+    }
+    [RelayCommand]
+    void ClearLogs()
+    {
+        LogDoc.Text = string.Empty;
+    }
+    void AddLog(string msg)
+    {
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            LogDoc.Insert(LogDoc.TextLength, msg + Environment.NewLine); 
+        });
     }
 }
    

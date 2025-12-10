@@ -16,10 +16,4 @@ public partial class SectorViewModel : ViewModelBase
     {
         Title = $"{index}扇区";
     }
-    [RelayCommand]
-    private void OnEdit()
-    {
-        var editor = new M1SectorEditor();
-        editor.Show();
-    }
 }

@@ -16,10 +16,10 @@ public partial class CardCheckViewModel : ViewModelBase
     [ObservableProperty] private string? feature1 = "";
     [ObservableProperty] private string? feature2 = "";
     
-    private readonly CardHelper CardHelper = new ();
+    private readonly CardHelper CardHelper = CardHelper.Instance;
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
     //读卡间隔
-    public int ReadTime;
+    public int ReadTime = 2000;
     //是否可以运行
     public bool CanRun = true;
     private readonly Dictionary<string,string> ChipType = new ()
@@ -44,7 +44,7 @@ public partial class CardCheckViewModel : ViewModelBase
     [RelayCommand]
     private async Task CheckChipType()
     {
-        if (!CVM.isConnected)
+        if (CardHelper.isConnected)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
             return;
@@ -65,7 +65,7 @@ public partial class CardCheckViewModel : ViewModelBase
                 Console.WriteLine("复位失败");
             }
             
-            if (!CardHelper.FindCard())
+            if (CardHelper.FindCard() == 0)
             {
                 Console.WriteLine("寻卡失败");
                 Clear();
@@ -121,7 +121,6 @@ public partial class CardCheckViewModel : ViewModelBase
     }
     void FM1208()
     {
-        
         CardType ="芯片型号为:" + "FM1208";
     }
     void Clear()

@@ -10,6 +10,7 @@ namespace D8_Demo.Tool;
 public class CardHelper
 {
     [DllImport("dcrf32.dll")] private static extern int dc_init(short port, int baud);//打开端口
+    [DllImport("dcrf32.dll")] private static extern int dc_exit(int icdev);//关闭端口
     [DllImport("dcrf32.dll")]
     private static extern short dc_pro_commandlink_hex(int icdev, byte slen, ref byte sendbuffer, ref byte rlen,
         ref byte databuffer, byte timeout); //发指令
@@ -35,24 +36,48 @@ public class CardHelper
     private static extern int dc_load_key(int icdev, int mode, int secnr, [In] byte[] nkey);  //密码装载到读写模块中
     [DllImport("dcrf32.dll")]
     private static extern short dc_authentication_passaddr(int icdev, byte _Mode,byte _Addr, [In]byte[] passbuff);//M1密码验证
+    [DllImport("dcrf32.dll")]private static extern short dc_authentication_pass(int icdev, byte _Mode,byte _Addr, [In]byte[] passbuff);//M1密码验证
     [DllImport("dcrf32.dll")]
     private static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata);  //M1读扇区
     [DllImport("dcrf32.dll")]
     private static extern int dc_write(int icdev, int _Adr, byte[] _Data);//M1写扇区
+    [DllImport("dcrf32.dll")] private static extern short dc_getname(int icdev, StringBuilder name);//获取设备名
+    [DllImport("dcrf32.dll")] private static extern short dc_getver(int icdev, StringBuilder sver);//获取设备名
+    [DllImport("dcrf32.dll")] private static extern short dc_beep(int icdev, uint _Msec);//蜂鸣
+    //设备号
+    private int icdev;
+    //是否已连接
+    public bool isConnected ;
+    //单例模式
+    public static CardHelper Instance { get; } = new();
 
-    private readonly ContentViewModel CVM = ContentViewModel.Instance;
-
-    int icdev => CVM.icdev;
-
+    private CardHelper()
+    {
+        
+    }
     //打开端口
     public bool OpenPort(int port, int hz)
     {
         int st = dc_init(Convert.ToInt16(port), hz);
-        Console.WriteLine("ST:"+st);
         if(st < 0) return false;
-        Console.WriteLine($"成功打开端口{icdev}");
-        CVM.icdev = st;
+        icdev = st;
+        isConnected = true;
         return true;
+    }
+    //关闭端口
+    public bool ClosePort()
+    {
+        if (dc_exit(icdev) == 0)
+        {
+            isConnected = false;
+            return true;
+        }
+        return false;
+    }
+    //蜂鸣
+    public void Beep(bool canBeep)
+    {
+        if(canBeep) dc_beep(icdev, 10);//蜂鸣
     }
     //向CPU卡发指令
     public string APDU(string sendbuffer)
@@ -79,11 +104,10 @@ public class CardHelper
     //复位
     public bool Reset()
     {
-        if (dc_reset(icdev, 2) != 0)
+        if (dc_reset(icdev, 10) != 0)
         {
             return false;
         }
-
         return true;
     }
 
@@ -107,10 +131,15 @@ public class CardHelper
     }
 
     //寻卡
-    public bool FindCard()
+    public ulong FindCard()
     {
         ulong CardUid = 0;
-        return dc_card(icdev, '0', ref CardUid) == 0;
+        if (dc_card(icdev, '0', ref CardUid) == 0)
+        {
+            return CardUid;
+        }
+        return 0;
+
     }
 
     //获取特征值
@@ -166,9 +195,9 @@ public class CardHelper
         return true;
     }
     //M1密码验证
-    public bool AuthenticationPass(byte _Mode, byte _Addr, byte[] passbuff)
+    public bool AuthenticationPass(byte _Mode, byte _Addr, string passbuff)
     {
-        if (dc_authentication_passaddr(icdev, _Mode, _Addr, passbuff) == 0)
+        if (dc_authentication_passaddr(icdev, _Mode, _Addr, Tools.HexStringToBytes(passbuff)) == 0)
         {
             return true;
         }
@@ -205,5 +234,29 @@ public class CardHelper
         }
 
         return true;
+    }
+    //获取设备名
+    public string GetDeviceName()
+    {
+        StringBuilder name = new StringBuilder(64); // 分配64字节缓冲区
+        if (dc_getname(icdev, name) == 0)
+        {
+            return name.ToString();
+        }
+
+        return "";
+        
+       
+    }
+    //获取版本号
+    public string GetDeviceVersion()
+    {
+        StringBuilder ver = new StringBuilder(128); // 分配128字节缓冲
+        if (dc_getver(icdev, ver) == 0)
+        {
+            return ver.ToString();
+        }
+
+        return "";
     }
 }
