@@ -1,0 +1,19 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:D8_Demo.ViewModels"
+             x:DataType="vm:PSAMReaderViewModel"
+             x:Class="D8_Demo.Views.UserControl.PSAMReader">
+    
+    <Design.DataContext>
+        <vm:PSAMReaderViewModel/>
+    </Design.DataContext>
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+        <TextBox Text="{Binding PsamData}"></TextBox>
+        <Button Grid.Row="1" Command="{Binding ReadPSAMCommand}">发送指令</Button>
+        <TextBox Grid.Row="2" Text="{Binding ResData}"></TextBox>
+    </Grid>
+    
+</UserControl>

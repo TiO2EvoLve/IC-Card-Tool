@@ -1,5 +1,4 @@
-﻿using D8_Demo.ViewModels;
-using System;
+﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -44,6 +43,14 @@ public class CardHelper
     [DllImport("dcrf32.dll")] private static extern short dc_getname(int icdev, StringBuilder name);//获取设备名
     [DllImport("dcrf32.dll")] private static extern short dc_getver(int icdev, StringBuilder sver);//获取设备名
     [DllImport("dcrf32.dll")] private static extern short dc_beep(int icdev, uint _Msec);//蜂鸣
+
+    [DllImport("dcrf32.dll")]
+    private static extern int dc_setcpu(int icdev,byte _Byte);//设置PSAM卡座
+    [DllImport("dcrf32.dll")]
+    public static extern short dc_cpureset(int icdev, ref byte rlen, [Out]byte[] databuffer);//接触式卡复位
+    [DllImport("dcrf32.dll")]private static extern int dc_cpuapduInt_hex(int icdev,int slen, string sendbuffer, ref int rlen, ref byte databuffer);//接触式卡指令交互
+    [DllImport("dcrf32.dll")]
+    public static extern short dc_cpuapduInt(int icdev, int slen, [In]byte[] sendbuffer, ref uint rlen, [Out]byte[] databuffer); 
     //设备号
     private int icdev;
     //是否已连接
@@ -100,6 +107,39 @@ public class CardHelper
 
         return strrbuff;
     }
+    //向接触式卡发指令
+    public string PSAMAPDU(string hexString)
+    {
+        uint rlen = 0;
+        byte[] databuffer = new byte[50];
+        byte[] sendbuffer = new byte[hexString.Length / 2];
+        for (int i = 0; i < sendbuffer.Length; i++)
+        {
+            sendbuffer[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+        }
+        int st = dc_cpuapduInt(icdev, sendbuffer.Length, sendbuffer, ref rlen, databuffer);
+        if (st != 0)
+        {
+            Console.WriteLine("指令发送失败");
+        }
+        else
+        {
+            Console.WriteLine("指令发送成功");     
+        }
+
+        Console.WriteLine($"返回长度：{rlen}");
+        return BitConverter.ToString(databuffer).Replace("-","");
+    }
+    //设置卡座
+    public bool Setcpu()
+    {
+        if (dc_setcpu(icdev,0x0C) != 0)
+        {
+            return false;
+        }
+        return true;
+    }
+    
 
     //复位
     public bool Reset()
@@ -110,6 +150,19 @@ public class CardHelper
         }
         return true;
     }
+    //PSAM卡复位
+    public bool PSAMReset()
+    {
+        byte rcardlen = 0;
+        byte[] databuffer = new byte[100];
+        int st = dc_cpureset(icdev, ref rcardlen, databuffer);
+        if (st < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+    
 
     //复位
     public string ResetHex()

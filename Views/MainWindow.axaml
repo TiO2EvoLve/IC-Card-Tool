@@ -126,6 +126,9 @@
                     <TabItem Header="M1读写">
                         <userControl:M1ReadView DataContext="{Binding M1ReadVm}" />
                     </TabItem>
+                    <TabItem Header="PSAM读写">
+                        <userControl:PSAMReader DataContext="{Binding PSAMVm}" />
+                    </TabItem>
                     <TabItem Header="系统设置">
                         <userControl:SettingView DataContext="{Binding SettingsVm}" />
                     </TabItem>

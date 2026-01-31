@@ -74,7 +74,7 @@ public partial class ContentViewModel : ViewModelBase
         {
             if (!CardHelper.OpenPort(Convert.ToInt16(Port), 115200))
             {
-                await MessageBoxManager.GetMessageBoxStandard("失败", "打开端口失败,请检查读卡器是否已连接").ShowAsync();
+                await ShowMessage("失败", "打开端口失败,请检查读卡器是否已连接");
             }else
             {
                 Color = Brushes.LimeGreen;
@@ -84,7 +84,7 @@ public partial class ContentViewModel : ViewModelBase
         }
         catch (DllNotFoundException)
         {
-            await MessageBoxManager.GetMessageBoxStandard("失败", "请根据你的系统更换对应的dcrf32.dll，请检查").ShowAsync();
+            await ShowMessage("失败", "请根据你的系统更换对应的dcrf32.dll，请检查");
         }
         DeviceName = CardHelper.GetDeviceName();
         FirmwareVersion = CardHelper.GetDeviceVersion();
@@ -214,7 +214,7 @@ public partial class ContentViewModel : ViewModelBase
     {
         if (Cards.Count == 0)
         {
-            await MessageBoxManager.GetMessageBoxStandard("失败", "没有数据需要保存").ShowAsync();
+            await ShowMessage("失败", "没有数据需要保存");
             return;
         }
         var sourceFilePath = "temple/卡片信息.mdb";
@@ -226,33 +226,28 @@ public partial class ContentViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await MessageBoxManager.GetMessageBoxStandard("异常", ex.Message).ShowAsync();
+            await ShowMessage("异常", ex.Message);
             return;
         }
         //保存数据到数据库
-        var sqls = new List<string>();
-
-        // 先清空表
-        sqls.Add("DELETE FROM kahao");
-        
-        foreach (var card in Cards)
-        {
-            string sql = $@"
+        var sqls = new List<string> {
+            // 先清空表
+            "DELETE FROM kahao" };
+        sqls.AddRange(Cards.Select(card => $@"
         INSERT INTO kahao (SN, ATS, UID16, UID16_, UID10, UID10_, [Time]) 
-        VALUES ('{card.SN}', '{card.ATS}', '{card.UID16}', '{card.UID16_}', '{card.UID10}', '{card.UID10_}', #{card.Time:yyyy-MM-dd HH:mm:ss}#)";
-            sqls.Add(sql);
-        }
+        VALUES ('{card.SN}', '{card.ATS}', '{card.UID16}', '{card.UID16_}', '{card.UID10}', '{card.UID10_}', #{card.Time:yyyy-MM-dd HH:mm:ss}#)"));
         try
         {
             await Task.Run(() => Mdb.ExecuteBatch(destinationFilePath, sqls));
-            await MessageBoxManager.GetMessageBoxStandard("成功", "数据已保存到桌面").ShowAsync();
+            await ShowMessage("成功", "数据已保存到桌面");
         }
         catch (Exception ex)
         {
-            await MessageBoxManager.GetMessageBoxStandard("失败", $"保存失败：{ex.Message}").ShowAsync();
+            await ShowMessage("失败", $"保存失败：{ex.Message}");
         }
     }
     #endregion
+    // 清除显示数据
     void Clear()
     {
         FindCard = Brushes.Red;
@@ -263,17 +258,24 @@ public partial class ContentViewModel : ViewModelBase
         Ats = "";
         Status = State.等待放卡;
     }
+    // 清除日志
     [RelayCommand]
     void ClearLogs()
     {
         LogDoc.Text = string.Empty;
     }
+    // 添加日志
     void AddLog(string msg)
     {
         Dispatcher.UIThread.Invoke(() =>
         {
             LogDoc.Insert(LogDoc.TextLength, msg + Environment.NewLine); 
         });
+    }
+    // 显示消息框
+    async Task ShowMessage(string title, string message)
+    {
+        await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
     }
 }
    

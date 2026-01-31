@@ -44,7 +44,7 @@ public partial class CardCheckViewModel : ViewModelBase
     [RelayCommand]
     private async Task CheckChipType()
     {
-        if (CardHelper.isConnected)
+        if (!CardHelper.isConnected)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
             return;
@@ -62,12 +62,12 @@ public partial class CardCheckViewModel : ViewModelBase
             }
             if (!CardHelper.Reset())
             {
-                Console.WriteLine("复位失败");
+                await ShowMessage("错误","复位失败");
             }
             
             if (CardHelper.FindCard() == 0)
             {
-                Console.WriteLine("寻卡失败");
+                await ShowMessage("错误","寻卡失败");
                 Clear();
                 continue;
             }
@@ -87,6 +87,12 @@ public partial class CardCheckViewModel : ViewModelBase
                 ReturnValue = "M1卡或UL卡";
                 continue;
             }
+            //获取特征值1
+            Feature1 = CardHelper.Request();
+            //获取特征值2
+            var uid =  CardHelper.Anticoll();
+            if(uid != "") Feature2 = CardHelper.Select(uid);
+            
             if (response.EndsWith("9000"))
             {
                 ReturnValue = response;
@@ -95,14 +101,8 @@ public partial class CardCheckViewModel : ViewModelBase
             }else
             {
                 //芯片为1208
-                ReturnValue = $"{Toml.GetToml(response[^4..],"desc")}({response[^4..]})" ;
-                FM1208();
+                FM1208(Feature1,ATS);
             }
-            //获取特征值1
-            Feature1 = CardHelper.Request();
-            //获取特征值2
-            var uid =  CardHelper.Anticoll();
-            if(uid != "") Feature2 = CardHelper.Select(uid);
             await Task.Delay(ReadTime);
         }
     }
@@ -119,14 +119,32 @@ public partial class CardCheckViewModel : ViewModelBase
             CardType = "未知型号芯片";
         }
     }
-    void FM1208()
+    void FM1208(string Feature,string ats)
     {
-        CardType ="芯片型号为:" + "FM1208";
+        ats = ats.Substring(ats.Length - 16, 8);
+        if (ats == "00000000" && Feature == "8")
+        {
+            CardType = "FM1208-09或FM1216-109";
+        }else if (ats == "00000000" && Feature == "4")
+        {
+            CardType = "FM1208-10或FM1216-110";
+        }else if (ats != "00000000" && Feature == "8")
+        {
+            CardType = "FM1208-59或FM1208-73或FM1216-143";
+        }else if (ats != "00000000" && Feature == "4")
+        {
+            CardType = "FM1208-76";
+        }
     }
     void Clear()
     {
         ReturnValue = "";
         ATS = "";
         CardType = "未检测到卡片";
+    }
+    // 显示消息框
+    async Task ShowMessage(string title, string message)
+    {
+        await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
     }
 }
