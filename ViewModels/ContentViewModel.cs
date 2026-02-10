@@ -46,7 +46,6 @@ public partial class ContentViewModel : ViewModelBase
     ];
     //选中的波特率
     [ObservableProperty] private string? selectedOption = "115200";
-    
     //卡号
     [ObservableProperty]private string sn = "1";
     [ObservableProperty] private bool isChecked = true;
@@ -56,12 +55,14 @@ public partial class ContentViewModel : ViewModelBase
     public int ReadTime;
     //是否蜂鸣
     public bool BeepSound = true;
-    //是否可以运行
-    public bool CanRun = true;
+    //运行状态
+    [ObservableProperty] private bool isRunning;
     //日志内容
     [ObservableProperty] private TextDocument logDoc = new ();
     //卡片帮助类
     private readonly CardHelper CardHelper = CardHelper.Instance;
+    private CancellationTokenSource? _cts;
+    private Task? _runningTask;
     //TODO :发布时改为私有
     public ContentViewModel() { }
     public static ContentViewModel Instance { get; } = new ();
@@ -72,7 +73,7 @@ public partial class ContentViewModel : ViewModelBase
         if (CardHelper.isConnected) return; //端口已经打开，无需继续操作。
         try
         {
-            if (!CardHelper.OpenPort(Convert.ToInt16(Port), 115200))
+            if (!CardHelper.OpenPort(Convert.ToInt16(Port), Convert.ToInt32(SelectedOption)))
             {
                 await ShowMessage("失败", "打开端口失败,请检查读卡器是否已连接");
             }else
@@ -111,93 +112,152 @@ public partial class ContentViewModel : ViewModelBase
     private async Task ReadCard()
     {
         if (!CardHelper.isConnected) await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
-        await Task.Run(Read);
+        await StartAsync();
     }
-    private void Read()
+
+    private Task StartAsync()
+    {
+        if (_cts != null) return Task.CompletedTask; // already running
+        _cts = new CancellationTokenSource();
+        IsRunning = true;
+        _runningTask = Task.Run(() => RunLoopAsync(_cts.Token));
+        return Task.CompletedTask;
+    }
+
+    public async Task StopAsync(TimeSpan? timeout = null)
+    {
+        if (_cts == null) return;
+        await _cts.CancelAsync();
+        timeout ??= TimeSpan.FromSeconds(2);
+        try
+        {
+            await Task.WhenAny(_runningTask ?? Task.CompletedTask, Task.Delay(timeout.Value));
+        }
+        catch
+        {
+            // ignored
+        }
+
+        _cts.Dispose();
+        _cts = null;
+        IsRunning = false;
+    }
+
+    private async Task RunLoopAsync(CancellationToken token)
     {
         ulong uid = 0;//记录上次读的卡片
-        while (true)
+        try
         {
-            if (!CardHelper.isConnected) break; // 如果端口关闭，跳出循环
-            if(!CanRun){
-                Clear();
-                Status = State.等待读取;
-                break; // 如果不可以运行，跳出循环
-            }
-            if (!CardHelper.Reset()) 
+            while (!token.IsCancellationRequested)
             {
-                Status = State.复位异常;
-                AddLog("复位异常");
-                return;
-            }
-            ulong CardUid = 0;
-            CardUid = CardHelper.FindCard();
-            if (CardUid != 0) // 0 表示成功
-            {
-                FindCard = Brushes.LimeGreen;
-                Status = State.读卡中;
-                Uid10_ = CardUid.ToString();
-                Uid16_ = CardUid.ToString("X");
-                Uid16 = Tools.ChangeHexPairs(Uid16_);
-                Uid10 = Convert.ToUInt32(Uid16, 16).ToString();
-                AddLog($"发现卡片:{Uid16}");
-            }else
-            {
-                Clear();
-                continue;
-            }
-            //取ATS
-            Ats = CardHelper.ResetHex();
-            if ( Ats == "")
-            {
-                Status = State.非CPU卡;
-                Ats = "非CPU卡";
-                Thread.Sleep(500);
-                continue;
-            }
-            
-            //判断是否为同一张卡
-            if (uid == CardUid)
-            {
-                Status = State.同一张卡;
-                Thread.Sleep(500);
-            }
-            uid = CardUid;
-            //判断是否已经有该数据
-            if (Cards != null && Cards.All(card => card.UID10_ != Uid10_))
-            {
-                Dispatcher.UIThread.InvokeAsync(() =>
+                if (!CardHelper.isConnected) break; // 如果端口关闭，跳出循环
+                if (!CardHelper.Reset())
                 {
-                    if (IsChecked)
-                    {
-                        Cards.Add(new Card
-                        {
-                            SN = Sn,
-                            UID10 = Uid10,
-                            UID10_ = Uid10_,
-                            UID16 = Uid16,
-                            UID16_ = Uid16_,
-                            ATS = Ats,
-                            Time = DateTime.Now
-                        });
-                        Sn = (Convert.ToInt32(Sn) + 1).ToString();
-                    }
-                    else
-                    {
-                        Cards.Add(new Card
-                        {
-                            UID10 = Uid10,
-                            UID10_ = Uid10_,
-                            UID16 = Uid16,
-                            UID16_ = Uid16_,
-                            ATS = Ats,
-                            Time = DateTime.Now
-                        }); 
-                    }
+                    await Dispatcher.UIThread.InvokeAsync(() => {
+                        Status = State.复位异常;
+                        AddLog("复位异常");
+                    });
+                    return;
+                }
+                ulong CardUid = CardHelper.FindCard();
+                if (CardUid != 0) // 0 表示失败
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() => {
+                        FindCard = Brushes.LimeGreen;
+                        Status = State.读卡中;
+                    });
                     
-                });
+                    var uid16_ = CardUid.ToString("X");
+                    var uid16 = Tools.ChangeHexPairs(uid16_);
+                    var uid10 = Convert.ToUInt32(uid16, 16).ToString();
+
+                    await Dispatcher.UIThread.InvokeAsync(() => {
+                        Uid10_ = uid16_;
+                        Uid16_ = uid16_;
+                        Uid16 = uid16;
+                        Uid10 = uid10;
+                        AddLog($"发现卡片:{Uid16}");
+                    });
+                    
+                }
+                else
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() => Clear());
+                    await Task.Delay(ReadTime, token);
+                    continue;
+                }
+                //取ATS
+                var curAts = CardHelper.ResetHex();
+                if (string.IsNullOrEmpty(curAts))
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() => {
+                        Status = State.非CPU卡;
+                        Ats = "非CPU卡";
+                    });
+                    await Task.Delay(500, token);
+                    continue;
+                }
+
+                //判断是否为同一张卡
+                if (uid == CardUid)
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() => Status = State.同一张卡);
+                    await Task.Delay(500, token);
+                }
+                uid = CardUid;
+                
+                //判断是否已经有该数据并添加
+                if (Cards != null && Cards.All(card => card.UID10_ != Uid10_))
+                {
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        if (IsChecked)
+                        {
+                            Cards.Add(new Card
+                            {
+                                SN = Sn,
+                                UID10 = Uid10,
+                                UID10_ = Uid10_,
+                                UID16 = Uid16,
+                                UID16_ = Uid16_,
+                                ATS = Ats,
+                                Time = DateTime.Now
+                            });
+                            Sn = (Convert.ToInt32(Sn) + 1).ToString();
+                        }
+                        else
+                        {
+                            Cards.Add(new Card
+                            {
+                                UID10 = Uid10,
+                                UID10_ = Uid10_,
+                                UID16 = Uid16,
+                                UID16_ = Uid16_,
+                                ATS = Ats,
+                                Time = DateTime.Now
+                            }); 
+                        }
+                    });
+                }
+
+                await Task.Delay(ReadTime, token);
             }
-            Thread.Sleep(ReadTime);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => AddLog("RunLoop 出错:" + ex.Message));
+        }
+        finally
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => {
+                FindCard = Brushes.Red;
+                Status = State.等待读取;
+                IsRunning = false;
+            });
+            _cts?.Dispose();
+            _cts = null;
+            _runningTask = null;
         }
     }
     #endregion
@@ -226,7 +286,7 @@ public partial class ContentViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowMessage("异常", ex.Message);
+            await ShowMessage("失败", $"保存失败：{ex.Message}");
             return;
         }
         //保存数据到数据库
@@ -265,11 +325,13 @@ public partial class ContentViewModel : ViewModelBase
         LogDoc.Text = string.Empty;
     }
     // 添加日志
-    void AddLog(string msg)
+    public void AddLog(string msg)
     {
         Dispatcher.UIThread.Invoke(() =>
         {
             LogDoc.Insert(LogDoc.TextLength, msg + Environment.NewLine); 
+            //滚动到最后一行
+            
         });
     }
     // 显示消息框

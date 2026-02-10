@@ -1,4 +1,6 @@
-﻿
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace D8_Demo.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
@@ -21,21 +23,23 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 _selectedTabIndex = value;
                 OnPropertyChanged(); 
-                UpdateRunningState();
+                _ = UpdateRunningStateAsync();
             }
         }
     }
 
-    private void UpdateRunningState()
+    private async Task UpdateRunningStateAsync()
     {
-        // 停止所有循环任务
-        ContentVm.CanRun = false;
-        CardCheckVm.CanRun = false;
-        // 根据当前选择的页面允许对应 VM 的循环任务
-        switch (SelectedTabIndex)
+        // 停止所有循环任务（并发发出停止请求）
+        var stopTasks = new List<Task>
         {
-            case 0: ContentVm.CanRun = true; break;
-            case 1: CardCheckVm.CanRun = true; break;
-        }
+            ContentVm.StopAsync(),
+            CardCheckVm.StopAsync(),
+            
+        };
+        // 等待短超时内停止完成，不阻塞 UI 过久
+        await Task.WhenAny(Task.WhenAll(stopTasks), Task.Delay(1500));
+
+       
     }
 }

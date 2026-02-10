@@ -1,11 +1,11 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System;
+using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
-using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Threading;
 
 
 namespace D8_Demo.ViewModels;
@@ -20,6 +20,9 @@ public partial class M1ReadViewModel : ViewModelBase
     
     private readonly CardHelper CardHelper = CardHelper.Instance;
 
+    private CancellationTokenSource? _cts;
+    private Task? _runningTask;
+
     public M1ReadViewModel()
     {
         for (int i = 0; i < 16; i++)
@@ -31,10 +34,27 @@ public partial class M1ReadViewModel : ViewModelBase
     [RelayCommand]
     private void Read()
     {
-        Task.Run(M1ReadSector);
+        _ = StartAsync();
     }
 
-    private async Task M1ReadSector()
+    public Task StartAsync()
+    {
+        if (_cts != null) return Task.CompletedTask;
+        _cts = new CancellationTokenSource();
+        _runningTask = Task.Run(() => M1ReadSector(_cts.Token));
+        return Task.CompletedTask;
+    }
+
+    public async Task StopAsync(TimeSpan? timeout = null)
+    {
+        if (_cts == null) return;
+        _cts.Cancel();
+        timeout ??= TimeSpan.FromSeconds(2);
+        try { await Task.WhenAny(_runningTask ?? Task.CompletedTask, Task.Delay(timeout.Value)); } catch { }
+        _cts.Dispose(); _cts = null; _runningTask = null;
+    }
+
+    private async Task M1ReadSector(CancellationToken token)
     {
         if (!CardHelper.isConnected)
         {
@@ -50,10 +70,9 @@ public partial class M1ReadViewModel : ViewModelBase
         }
         string content = "";
         //验证卡密码
-        
-        for (byte i = 0; i < 16; i++)
+        for (byte i = 0; i < 16 && !token.IsCancellationRequested; i++)
         {
-            for (byte j = 0; j < 4; j++)
+            for (byte j = 0; j < 4 && !token.IsCancellationRequested; j++)
             {
                 if (CardHelper.AuthenticationPass(0x00, (byte)(4 * i + j), PassWorld))
                 {

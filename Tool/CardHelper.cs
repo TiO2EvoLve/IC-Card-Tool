@@ -93,7 +93,7 @@ public class CardHelper
         byte len = (byte)(sbuff.Count() / 2);
         byte rlen = 1;
         byte[] rbuff = new byte[64];
-        int st = dc_pro_commandlink_hex(icdev, len, ref sbuff[0], ref rlen, ref rbuff[0], 7);
+        int st = dc_pro_commandlink_hex(icdev, len, ref sbuff[0], ref rlen, ref rbuff[0], 3);
         if (st != 0)
         {
             return null;
@@ -139,12 +139,10 @@ public class CardHelper
         }
         return true;
     }
-    
-
     //复位
-    public bool Reset()
+    public bool Reset(uint time = 10)
     {
-        if (dc_reset(icdev, 10) != 0)
+        if (dc_reset(icdev, time) != 0)
         {
             return false;
         }

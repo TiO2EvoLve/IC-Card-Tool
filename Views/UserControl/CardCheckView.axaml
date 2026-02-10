@@ -9,11 +9,11 @@
     <Design.DataContext>
         <vm:CardCheckViewModel />
     </Design.DataContext>
-    
+
     <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
         <StackPanel VerticalAlignment="Center" Spacing="20">
-            <Button Command="{Binding CheckChipTypeCommand}">测试</Button>
-            
+            <Button Width="200" Theme="{DynamicResource SolidButton}" Command="{Binding CheckChipTypeCommand}">测试</Button>
+
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="卡返回值：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
@@ -23,18 +23,22 @@
             <TextBlock Text="复位信息：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
             <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
         </StackPanel>
-        
-        <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" >
+
+        <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="特征值1：" VerticalAlignment="Center"></TextBlock>
             <TextBox Text="{Binding Feature1}" IsReadOnly="True" MinWidth="100"></TextBox>
             <TextBlock Text="特征值2：" VerticalAlignment="Center"></TextBlock>
             <TextBox Text="{Binding Feature2}" IsReadOnly="True" MinWidth="100"></TextBox>
         </StackPanel>
         
-        <StackPanel Grid.Row="4" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green" FontWeight="Bold" MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}" Content="{Binding CardType}" ></Label>
-        </StackPanel>
-        
+        <Border Grid.Row="4" Margin="10"  BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
+            <Grid RowDefinitions="Auto,Auto" RowSpacing="10" HorizontalAlignment="Center" Margin="20">
+                <TextBlock Text="检测结果" HorizontalAlignment="Center"></TextBlock>
+                <Label Grid.Row="1" HorizontalContentAlignment="Center" Classes="Ghost Large Green" FontWeight="Bold"
+                       MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}" Content="{Binding CardType}">
+                </Label>
+            </Grid>
+        </Border>
     </Grid>
-   
+
 </UserControl>
