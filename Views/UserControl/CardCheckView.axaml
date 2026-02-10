@@ -12,7 +12,7 @@
 
     <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
         <StackPanel VerticalAlignment="Center" Spacing="20">
-            <Button Width="200" Theme="{DynamicResource SolidButton}" Command="{Binding CheckChipTypeCommand}">测试</Button>
+            <Button Width="100" Height="40" Theme="{DynamicResource SolidButton}" Command="{Binding CheckChipTypeCommand}">测试</Button>
 
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
