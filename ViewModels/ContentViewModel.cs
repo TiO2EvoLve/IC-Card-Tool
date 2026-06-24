@@ -187,8 +187,8 @@ public partial class ContentViewModel : ViewModelBase
                     continue;
                 }
                 //取ATS
-                var curAts = CardHelper.ResetHex();
-                if (string.IsNullOrEmpty(curAts))
+                Ats = CardHelper.ResetHex();
+                if (string.IsNullOrEmpty(Ats))
                 {
                     await Dispatcher.UIThread.InvokeAsync(() => {
                         Status = State.非CPU卡;

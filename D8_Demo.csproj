@@ -8,6 +8,11 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <LangVersion>default</LangVersion>
+        <Authors>TiO2 EvoLve</Authors>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+      <DebugType>full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,27 +20,27 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.9" />
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.9" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+        <PackageReference Include="Avalonia" Version="12.0.4" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.9">
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.17">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">none</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-        <PackageReference Include="Irihi.Ursa" Version="1.14.0" />
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.14.0" />
-        <PackageReference Include="MessageBox.Avalonia" Version="3.3.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
-        <PackageReference Include="Semi.Avalonia" Version="11.3.7.1" />
-        <PackageReference Include="Semi.Avalonia.AvaloniaEdit" Version="11.2.0.1" />
-        <PackageReference Include="System.Data.OleDb" Version="10.0.1" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Irihi.Ursa" Version="2.0.1" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.1" />
+        <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
+        <PackageReference Include="Semi.Avalonia" Version="12.0.3" />
+        <PackageReference Include="Semi.Avalonia.AvaloniaEdit" Version="12.0.0" />
+        <PackageReference Include="System.Data.OleDb" Version="10.0.9" />
         <PackageReference Include="Tommy" Version="3.1.2" />
     </ItemGroup>
 
@@ -66,6 +71,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Services\" />
       <Folder Include="temple\" />
     </ItemGroup>
 </Project>

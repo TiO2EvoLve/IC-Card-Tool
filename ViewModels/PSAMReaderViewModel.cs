@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Threading;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Tool;
@@ -52,4 +53,5 @@ public partial class PSAMReaderViewModel: ViewModelBase
     {
         await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
     }
+    
 }
