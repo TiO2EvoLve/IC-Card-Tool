@@ -10,6 +10,24 @@
         <vm:M1ReadViewModel />
     </Design.DataContext>
 
+    <UserControl.Styles>
+        <Style Selector="Button.block-cell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="Button.block-cell.selected">
+            <Setter Property="Background" Value="#f6ffed" />
+            <Setter Property="BorderBrush" Value="#b7eb8f" />
+            <Setter Property="Foreground" Value="#52c41a" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
@@ -18,58 +36,51 @@
             <Button Command="{Binding ReadCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
             <Button Classes="Secondary">写入</Button>
         </StackPanel>
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Sectors}">
+
+
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Sectors}" Margin="5">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <!-- 用 UniformGrid 来自动布局 -->
-                    <UniformGrid Margin="5" Rows="16" Columns="1" ColumnSpacing="10" RowSpacing="10" />
+                    <StackPanel Spacing="8" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-
             <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
+                <DataTemplate x:DataType="vm:SectorViewModel">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                         <Label Classes="Ghost Blue"
                                Theme="{DynamicResource TagLabel}"
                                HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
                                Content="{Binding Title}" />
-                        <Grid ColumnDefinitions="*,*,*,*" Grid.Column="1" 
-                                     HorizontalAlignment="Stretch"
-                                     VerticalAlignment="Stretch"
-                                     ColumnSpacing="10" >
-                            <Viewbox Stretch="Uniform" >
-                                <ListBox>
-                                    <ListBoxItem><TextBlock Text="{Binding Block0}"/></ListBoxItem>
-                                </ListBox>
-                            </Viewbox>
-                            <Viewbox Stretch="Uniform" Grid.Column="1">
-                                <ListBox>
-                                    <ListBoxItem><TextBlock Text="{Binding Block1}"/></ListBoxItem>
-                                </ListBox>
-                            </Viewbox>
-                            <Viewbox Stretch="Uniform" Grid.Column="2">
-                                <ListBox>
-                                    <ListBoxItem><TextBlock Text="{Binding Block2}"/></ListBoxItem>
-                                </ListBox>
-                            </Viewbox>
-                            <Viewbox Stretch="Uniform" Grid.Column="3">
-                                <ListBox>
-                                    <ListBoxItem><TextBlock Text="{Binding Block3}"/></ListBoxItem>
-                                </ListBox>
-                            </Viewbox>
-                        </Grid>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Blocks}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="4" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:BlockCellViewModel">
+                                    <Button Classes="block-cell"
+                                            Classes.selected="{Binding IsSelected}"
+                                            Command="{Binding SelectCommand}">
+                                        <TextBlock Text="{Binding Data}"
+                                                   TextAlignment="Left"
+                                                   FontSize="10" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Grid Grid.Row="2">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-                <TextBlock Text="块数据：" VerticalAlignment="Center"></TextBlock>
-                <TextBox MinWidth="200"></TextBox>
-                <Button Content="写入"/>
-            </StackPanel>
-        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+            <TextBlock Text="块数据：" VerticalAlignment="Center" />
+            <TextBox MinWidth="300" Text="{Binding SelectedBlockData}" />
+            <TextBlock Text="位置：" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding SelectedPosition}" VerticalAlignment="Center" Foreground="Blue" />
+            <Button Content="写入" Command="{Binding WriteCommand}"/>
+        </StackPanel>
     </Grid>
-
-
 </UserControl>

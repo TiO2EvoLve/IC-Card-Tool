@@ -4,40 +4,56 @@ using D8_Demo.Tool;
 using MsBox.Avalonia;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia.Threading;
+using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Threading;
-using Avalonia.Controls;
-using Avalonia.Media;
-
 
 namespace D8_Demo.ViewModels;
 
 public partial class M1ReadViewModel : ViewModelBase
 {
-    [ObservableProperty] private byte index = 0;
     [ObservableProperty] private string passWorld = "FFFFFFFFFFFF";
+
     public static M1ReadViewModel Instance { get; } = new();
-    private readonly ContentViewModel CVM = ContentViewModel.Instance;
+    
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
-    
     private readonly CardHelper CardHelper = CardHelper.Instance;
+    private readonly ContentViewModel CVM = ContentViewModel.Instance;
+    //日志内容
     
+    [ObservableProperty] private string selectedBlockData = "";
+    [ObservableProperty] private string selectedPosition = "未选择";
+    [ObservableProperty] private int selectedSectorIndex = -1;
+    [ObservableProperty] private int selectedBlockIndex = -1;
 
     public M1ReadViewModel()
     {
         for (int i = 0; i < 16; i++)
+            Sectors.Add(new SectorViewModel(i, this));
+    }
+
+    public void SelectBlock(int sectorIndex, int blockIndex)
+    {
+        SelectedSectorIndex = sectorIndex;
+        SelectedBlockIndex = blockIndex;
+        RefreshSelectedDisplay();
+    }
+
+    private void RefreshSelectedDisplay()
+    {
+        if (SelectedSectorIndex < 0 || SelectedBlockIndex < 0)
         {
-            Sectors.Add(new SectorViewModel(i));
+            SelectedBlockData = "";
+            SelectedPosition = "未选择";
+            return;
         }
-       
+
+        SelectedBlockData = Sectors[SelectedSectorIndex].Blocks[SelectedBlockIndex].Data;
+        SelectedPosition = $"扇区{SelectedSectorIndex}，块{SelectedBlockIndex}";
     }
 
     [RelayCommand]
-    private void Read()
-    {
-        _ = M1ReadSector();
-    }
-    
+    private void Read() => _ = M1ReadSector();
 
     private async Task M1ReadSector()
     {
@@ -53,11 +69,11 @@ public partial class M1ReadViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("警告", "寻卡失败").ShowAsync();
             return;
         }
-        // 每个扇区4个块，分别写入 Block0~Block3
-        for (byte i = 0; i < 16 ; i++)
+
+        for (byte i = 0; i < 16; i++)
         {
             var sector = Sectors[i];
-            for (byte j = 0; j < 4 ; j++)
+            for (byte j = 0; j < 4; j++)
             {
                 string blockContent;
                 if (CardHelper.AuthenticationPass(0x00, (byte)(4 * i + j), PassWorld))
@@ -69,42 +85,53 @@ public partial class M1ReadViewModel : ViewModelBase
                 {
                     blockContent = "密码错误";
                 }
-                switch (j)
-                {
-                    case 0: sector.Block0 = blockContent; break;
-                    case 1: sector.Block1 = blockContent; break;
-                    case 2: sector.Block2 = blockContent; break;
-                    case 3: sector.Block3 = blockContent; break;
-                }
+
+                sector.SetBlockData(j, blockContent);
             }
         }
+
+        RefreshSelectedDisplay();
     }
+
+    [RelayCommand]
+    public void Write() => _ = M1WriteSector();
     
-    private void FitText(TextBox tb)
+
+    private async Task M1WriteSector()
     {
-        if (string.IsNullOrEmpty(tb.Text))
-            return;
-
-        double targetWidth = tb.Bounds.Width - 10;
-
-        double fontSize = 100;
-
-        while (fontSize > 1)
+        if (SelectedBlockData.Length != 32)
         {
-            var text = new FormattedText(
-                tb.Text,
-                System.Globalization.CultureInfo.CurrentCulture,
-                FlowDirection.LeftToRight,
-                new Typeface(tb.FontFamily),
-                fontSize,
-                Brushes.Black);
-
-            if (text.Width <= targetWidth)
-                break;
-
-            fontSize--;
+            await MessageBoxManager.GetMessageBoxStandard("警告", $"写入位数错误:{SelectedBlockData.Length}").ShowAsync();
+            return;
+        }
+        
+        if (!CardHelper.isConnected)
+        {
+            await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
+            return;
         }
 
-        tb.FontSize = fontSize;
+        CardHelper.Reset();
+        if (CardHelper.FindCard() == 0)
+        {
+            await MessageBoxManager.GetMessageBoxStandard("警告", "寻卡失败").ShowAsync();
+            return;
+        }
+
+        if (!CardHelper.AuthenticationPass(0x00, (byte)(SelectedSectorIndex * 4 + SelectedBlockIndex), PassWorld))
+        {
+            CVM.AddLog("密码验证错误");
+            return;
+        }
+        if(CardHelper.M1WriteSector(SelectedSectorIndex * 4 + SelectedBlockIndex, SelectedBlockData))
+        {
+            CVM.AddLog("M1修改成功");
+            Read();
+        }
+        else
+        {
+            CVM.AddLog("M1修改失败");
+        }
+
     }
 }

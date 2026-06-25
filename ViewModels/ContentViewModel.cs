@@ -137,6 +137,10 @@ public partial class ContentViewModel : ViewModelBase
         {
             // ignored
         }
+        finally
+        {
+            CardHelper.Beep(BeepSound);
+        }
 
         _cts.Dispose();
         _cts = null;
@@ -239,7 +243,7 @@ public partial class ContentViewModel : ViewModelBase
                         }
                     });
                 }
-
+                CardHelper.Beep(BeepSound);
                 await Task.Delay(ReadTime, token);
             }
         }

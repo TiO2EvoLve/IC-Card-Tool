@@ -71,7 +71,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\" />
       <Folder Include="temple\" />
     </ItemGroup>
 </Project>

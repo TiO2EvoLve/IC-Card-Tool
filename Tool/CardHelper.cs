@@ -271,6 +271,16 @@ public class CardHelper
         }
         return sb.ToString();
     }
+    //M1写扇区
+    public bool M1WriteSector(int address, string data)
+    {
+        address = Convert.ToInt16(address);
+        if(dc_write(icdev, address, Tools.strToHexByte(data)) == 0)
+        {
+            return true;
+        }
+        return false;
+    }
     //加载密钥
     public bool LoadKey(int secnr,string strKey,int KeyStyle)
     {
