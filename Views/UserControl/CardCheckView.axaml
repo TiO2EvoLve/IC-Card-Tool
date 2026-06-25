@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:CardCheckViewModel"
              x:Class="D8_Demo.Views.UserControl.CardCheckView">
@@ -10,35 +10,65 @@
         <vm:CardCheckViewModel />
     </Design.DataContext>
 
-    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-        <StackPanel VerticalAlignment="Center" Spacing="20">
-            <Button Width="100" Height="40" Theme="{DynamicResource SolidButton}" Command="{Binding CheckChipTypeCommand}">测试</Button>
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="20">
+        <Grid ColumnDefinitions="*,*">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="10">
+                <TextBlock Text="芯片判断" FontSize="18" FontWeight="SemiBold"></TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
+                          Width="24" Height="24"
+                          Foreground="{Binding FindCard}" />
+                <Button Width="100" Height="40" Theme="{DynamicResource SolidButton}"
+                        Command="{Binding CheckChipTypeCommand}">
+                    开始检测
+                </Button>
+                <Button Width="100" Height="40" Classes="Warning" Command="{Binding StopChipTypeCommand}">停止检测</Button>
+            </StackPanel>
 
-        </StackPanel>
-        <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="卡返回值：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-            <TextBox MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
-        </StackPanel>
-        <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="复位信息：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-            <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
-        </StackPanel>
+        </Grid>
 
-        <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="特征值1：" VerticalAlignment="Center"></TextBlock>
-            <TextBox Text="{Binding Feature1}" IsReadOnly="True" MinWidth="100"></TextBox>
-            <TextBlock Text="特征值2：" VerticalAlignment="Center"></TextBlock>
-            <TextBox Text="{Binding Feature2}" IsReadOnly="True" MinWidth="100"></TextBox>
-        </StackPanel>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <TextBlock Text="读卡间隔："></TextBlock>
+            <ProgressBar Grid.Column="1"  Minimum="0" Maximum="5000" Value="{Binding ReadTime}" Background="Lavender"/>
+            <TextBlock Grid.Column="2" Text="{Binding ReadTime}"></TextBlock>
+        </Grid>
         
-        <Border Grid.Row="4" Margin="10"  BorderBrush="Lavender" BorderThickness="1" CornerRadius="10">
-            <Grid RowDefinitions="Auto,Auto" RowSpacing="10" HorizontalAlignment="Center" Margin="20">
-                <TextBlock Text="检测结果" HorizontalAlignment="Center"></TextBlock>
-                <Label Grid.Row="1" HorizontalContentAlignment="Center" Classes="Ghost Large Green" FontWeight="Bold"
-                       MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}" Content="{Binding CardType}">
-                </Label>
-            </Grid>
-        </Border>
+        
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+            </Border>
+            <Border Grid.Column="1"  BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" >
+                    <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green"
+                               FontWeight="Bold" 
+                               MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}"
+                               Content="{Binding CardType}">
+                        </Label>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="卡返回值：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        <TextBox MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="复位信息：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="特征值1：" VerticalAlignment="Center"></TextBlock>
+                        <TextBox Text="{Binding Feature1}" IsReadOnly="True" MinWidth="100"></TextBox>
+                        <TextBlock Text="特征值2：" VerticalAlignment="Center"></TextBlock>
+                        <TextBox Text="{Binding Feature2}" IsReadOnly="True" MinWidth="100"></TextBox>
+                    </StackPanel>
+
+
+                </Grid>
+            </Border>
+        </Grid>
+
     </Grid>
 
 </UserControl>

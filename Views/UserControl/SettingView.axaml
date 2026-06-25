@@ -36,7 +36,7 @@
             <DockPanel>
                 <TextBlock Text="卡片读取间隔(ms)" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                    <Slider MaxWidth="400" Maximum="10000" Minimum="500" Value="{Binding SleepTime}" MinWidth="200" VerticalAlignment="Center"></Slider>
+                    <Slider MaxWidth="400" Maximum="5000" Minimum="100" Value="{Binding SleepTime}" MinWidth="200" VerticalAlignment="Center"></Slider>
                     <TextBox MinWidth="40" Text="{Binding SleepTime}"></TextBox>
                 </StackPanel>
             </DockPanel>

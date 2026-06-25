@@ -6,6 +6,8 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Threading;
+using Avalonia.Controls;
+using Avalonia.Media;
 
 
 namespace D8_Demo.ViewModels;
@@ -27,6 +29,7 @@ public partial class M1ReadViewModel : ViewModelBase
         {
             Sectors.Add(new SectorViewModel(i));
         }
+       
     }
 
     [RelayCommand]
@@ -75,5 +78,33 @@ public partial class M1ReadViewModel : ViewModelBase
                 }
             }
         }
+    }
+    
+    private void FitText(TextBox tb)
+    {
+        if (string.IsNullOrEmpty(tb.Text))
+            return;
+
+        double targetWidth = tb.Bounds.Width - 10;
+
+        double fontSize = 100;
+
+        while (fontSize > 1)
+        {
+            var text = new FormattedText(
+                tb.Text,
+                System.Globalization.CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                new Typeface(tb.FontFamily),
+                fontSize,
+                Brushes.Black);
+
+            if (text.Width <= targetWidth)
+                break;
+
+            fontSize--;
+        }
+
+        tb.FontSize = fontSize;
     }
 }

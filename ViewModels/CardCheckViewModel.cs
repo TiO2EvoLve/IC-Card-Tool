@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,11 +13,13 @@ namespace D8_Demo.ViewModels;
 
 public partial class CardCheckViewModel : ViewModelBase
 {
+    [ObservableProperty] private IImmutableSolidColorBrush findCard =  Brushes.Red;
     [ObservableProperty] private string? returnValue;//返回值
     [ObservableProperty] private string? cardType = "未检测到卡片";
     [ObservableProperty] private string? aTS = "";//ATS
     [ObservableProperty] private string? feature1 = "";//特征1
     [ObservableProperty] private string? feature2 = "";//特征2
+
     private readonly CardHelper CardHelper = CardHelper.Instance;
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
     //读卡间隔
@@ -64,6 +67,10 @@ public partial class CardCheckViewModel : ViewModelBase
         {
             // ignored
         }
+        finally
+        {
+            FindCard = Brushes.Red;
+        }
         _cts.Dispose();
         _cts = null;
     }
@@ -78,12 +85,19 @@ public partial class CardCheckViewModel : ViewModelBase
         }
         _ = StartAsync();
     }
+    [RelayCommand]
+    private void StopChipType()
+    {
+        _ = StopAsync();
+        
+    }
 
     private async Task Check(CancellationToken token)
     {
         AddLog("开始检测卡片...");
         while (!token.IsCancellationRequested)
         {
+            FindCard = Brushes.LimeGreen;
             if (!CardHelper.Reset() || CardHelper.FindCard() == 0)
             {
                 AddLog("复位/寻卡失败");
@@ -119,16 +133,15 @@ public partial class CardCheckViewModel : ViewModelBase
             if(uid != "") Feature2 = CardHelper.Select(uid);
             if (response.EndsWith("9000"))
             {
-                AddLog("检测到 FM1280 系列芯片");
                 ReturnValue = response;
                 //芯片为1280
                 FM1280(response);
             }else
             {
                 //芯片为1208
-                AddLog("检测到 FM12081 系列芯片");
                 FM1208(Feature1,ATS);
             }
+            FindCard = Brushes.Red;
             await Task.Delay(ReadTime, token);
         }
 

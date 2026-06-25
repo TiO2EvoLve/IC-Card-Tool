@@ -51,7 +51,7 @@ public partial class SettingsViewModel : ViewModelBase
     private void Reset(Window window)
     {
         SelectedTheme = "Default";
-        SleepTime = 2000;
+        SleepTime = 500;
         Sound = false;
         _ = Save(window);
     }

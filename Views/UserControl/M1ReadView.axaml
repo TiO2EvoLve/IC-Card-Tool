@@ -11,7 +11,7 @@
     </Design.DataContext>
 
 
-    <Grid Margin="10" RowDefinitions="Auto,*" RowSpacing="10">
+    <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
             <TextBox Width="200" Text="{Binding PassWorld}" />
@@ -33,49 +33,42 @@
                                Theme="{DynamicResource TagLabel}"
                                HorizontalAlignment="Center"
                                Content="{Binding Title}" />
-                        <UniformGrid Columns="4" Grid.Column="1" 
+                        <Grid ColumnDefinitions="*,*,*,*" Grid.Column="1" 
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Stretch"
-                                     Margin="0">
-    
-                            <Viewbox>
-                                <Border MinWidth="80" Background="Transparent" >
-                                    <TextBox Text="{Binding Block0}" 
-                                             BorderThickness="0"
-                                             Background="Transparent"/>
-                                </Border>
+                                     ColumnSpacing="10" >
+                            <Viewbox Stretch="Uniform" >
+                                <ListBox>
+                                    <ListBoxItem><TextBlock Text="{Binding Block0}"/></ListBoxItem>
+                                </ListBox>
                             </Viewbox>
-    
-                            <Viewbox>
-                                <Border MinWidth="80" Background="Transparent">
-                                    <TextBox Text="{Binding Block1}" 
-                                             BorderThickness="0"
-                                             Background="Transparent"/>
-                                </Border>
+                            <Viewbox Stretch="Uniform" Grid.Column="1">
+                                <ListBox>
+                                    <ListBoxItem><TextBlock Text="{Binding Block1}"/></ListBoxItem>
+                                </ListBox>
                             </Viewbox>
-    
-                            <Viewbox>
-                                <Border MinWidth="80" Background="Transparent">
-                                    <TextBox Text="{Binding Block2}" 
-                                             BorderThickness="0"
-                                             Background="Transparent"/>
-                                </Border>
+                            <Viewbox Stretch="Uniform" Grid.Column="2">
+                                <ListBox>
+                                    <ListBoxItem><TextBlock Text="{Binding Block2}"/></ListBoxItem>
+                                </ListBox>
                             </Viewbox>
-    
-                            <Viewbox>
-                                <Border MinWidth="80" Background="Transparent">
-                                    <TextBox Text="{Binding Block3}" 
-                                             BorderThickness="0"
-                                             Background="Transparent"/>
-                                </Border>
+                            <Viewbox Stretch="Uniform" Grid.Column="3">
+                                <ListBox>
+                                    <ListBoxItem><TextBlock Text="{Binding Block3}"/></ListBoxItem>
+                                </ListBox>
                             </Viewbox>
-    
-                        </UniformGrid>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
+        <Grid Grid.Row="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                <TextBlock Text="块数据：" VerticalAlignment="Center"></TextBlock>
+                <TextBox MinWidth="200"></TextBox>
+                <Button Content="写入"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 
 
