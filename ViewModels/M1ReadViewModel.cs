@@ -1,11 +1,8 @@
-using System;
 using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Threading;
-using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace D8_Demo.ViewModels;
@@ -13,9 +10,7 @@ namespace D8_Demo.ViewModels;
 public partial class M1ReadViewModel : ViewModelBase
 {
     [ObservableProperty] private string passWorld = "FFFFFFFFFFFF";
-
     public static M1ReadViewModel Instance { get; } = new();
-    
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
     private readonly CardHelper CardHelper = CardHelper.Instance;
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
@@ -47,7 +42,6 @@ public partial class M1ReadViewModel : ViewModelBase
             SelectedPosition = "未选择";
             return;
         }
-
         SelectedBlockData = Sectors[SelectedSectorIndex].Blocks[SelectedBlockIndex].Data;
         SelectedPosition = $"扇区{SelectedSectorIndex}，块{SelectedBlockIndex}";
     }

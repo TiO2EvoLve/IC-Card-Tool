@@ -7,10 +7,9 @@ namespace D8_Demo.Tool;
 
 public class SettingsManage
 {
-    private static readonly string FilePath =
-        Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+    private static readonly string FilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
 
-    public static AppSettings Settings { get; private set; } = new();
+    public static AppSettings Settings  = AppSettings.Instance;
 
     static SettingsManage() => Load();
 
@@ -19,7 +18,7 @@ public class SettingsManage
         if (File.Exists(FilePath))
         {
             var json = File.ReadAllText(FilePath);
-            Settings = JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            Settings = JsonSerializer.Deserialize<AppSettings>(json) ?? AppSettings.Instance;
         }
     }
 

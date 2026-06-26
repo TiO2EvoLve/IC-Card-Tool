@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using D8_Demo.Models;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
 
@@ -19,11 +21,13 @@ public partial class CardCheckViewModel : ViewModelBase
     [ObservableProperty] private string? aTS = "";//ATS
     [ObservableProperty] private string? feature1 = "";//特征1
     [ObservableProperty] private string? feature2 = "";//特征2
-
-    private readonly CardHelper CardHelper = CardHelper.Instance;
+    [ObservableProperty]private int lastDuration;//上次耗时
+    [ObservableProperty]private int count;//计数
+    
+    private readonly CardHelper CardHelper = CardHelper.Instance;//卡片工具类
     private readonly ContentViewModel CVM = ContentViewModel.Instance;
-    //读卡间隔
-    public int ReadTime { get; set; } = 500;
+    private static AppSettings Settings { get; set; }  = AppSettings.Instance;//全局设置
+    
     private static readonly IReadOnlyDictionary<string, string> ChipType =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -39,6 +43,9 @@ public partial class CardCheckViewModel : ViewModelBase
         };
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
+    
+    
+    
     //TODO :发布时改为私有
     public CardCheckViewModel()
     {
@@ -70,8 +77,10 @@ public partial class CardCheckViewModel : ViewModelBase
         finally
         {
             FindCard = Brushes.Red;
+            Count = 0;//计数归0
+            CardType = "已停止检测";
         }
-        _cts.Dispose();
+;        _cts.Dispose();
         _cts = null;
     }
 
@@ -94,16 +103,17 @@ public partial class CardCheckViewModel : ViewModelBase
 
     private async Task Check(CancellationToken token)
     {
-        AddLog("开始检测卡片...");
         while (!token.IsCancellationRequested)
         {
+            // 开始计时
+            var stopwatch = Stopwatch.StartNew();
             FindCard = Brushes.LimeGreen;
             if (!CardHelper.Reset() || CardHelper.FindCard() == 0)
             {
                 AddLog("复位/寻卡失败");
                 Clear();
                 CardType = "未检测到卡片";
-                await Task.Delay(ReadTime, token);
+                await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
             //复位ATS
@@ -114,7 +124,7 @@ public partial class CardCheckViewModel : ViewModelBase
                 AddLog("卡片可能为M1卡或UL卡");
                 //为M1卡或UL卡
                 CardType = "M1卡或UL卡";
-                await Task.Delay(ReadTime, token);
+                await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
             ATS = ats;
@@ -142,7 +152,12 @@ public partial class CardCheckViewModel : ViewModelBase
                 FM1208(Feature1,ATS);
             }
             FindCard = Brushes.Red;
-            await Task.Delay(ReadTime, token);
+            CardHelper.Beep(Settings.Sound);
+            Count++;
+            // 停止计时并记录
+            stopwatch.Stop();
+            LastDuration = (int)stopwatch.ElapsedMilliseconds;
+            await Task.Delay(Settings.SleepTime, token);
         }
 
     }
@@ -172,20 +187,14 @@ public partial class CardCheckViewModel : ViewModelBase
         }
 
         var core = ats.Substring(ats.Length - 16, 8); // safe now
-        bool isZero = core == "00000000";
-        switch (feature)
+        var isZero = core == "00000000";
+        _ = feature switch
         {
-            case "8":
-                _ = Dispatcher.UIThread.InvokeAsync(() =>
-                    CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143");
-                break;
-            case "4":
-                _ = Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-10或FM1216-110" : "FM1208-76");
-                break;
-            default:
-                _ = Dispatcher.UIThread.InvokeAsync(() => CardType = "未知 FM1208 特征");
-                break;
-        }
+            "8" => Dispatcher.UIThread.InvokeAsync(() =>
+                CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
+            "4" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-10或FM1216-110" : "FM1208-76"),
+            _ => Dispatcher.UIThread.InvokeAsync(() => CardType = "未知 FM1208 特征")
+        };
     }
 
     void Clear()

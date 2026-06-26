@@ -51,10 +51,8 @@ public partial class ContentViewModel : ViewModelBase
     [ObservableProperty] private bool isChecked = true;
     //卡片列表
     public ObservableCollection<Card> Cards { get; set; } = new();
-    //读卡间隔
-    public int ReadTime;
-    //是否蜂鸣
-    public bool BeepSound = true;
+    //全局设置
+    private static AppSettings Settings  = AppSettings.Instance;
     //运行状态
     [ObservableProperty] private bool isRunning;
     //日志内容
@@ -79,7 +77,7 @@ public partial class ContentViewModel : ViewModelBase
             }else
             {
                 Color = Brushes.LimeGreen;
-                CardHelper.Beep(BeepSound);
+                CardHelper.Beep(Settings.Sound);
                 AddLog("打开端口成功！");
             }
         }
@@ -139,7 +137,7 @@ public partial class ContentViewModel : ViewModelBase
         }
         finally
         {
-            CardHelper.Beep(BeepSound);
+            CardHelper.Beep(Settings.Sound);
         }
 
         _cts.Dispose();
@@ -187,7 +185,7 @@ public partial class ContentViewModel : ViewModelBase
                 else
                 {
                     await Dispatcher.UIThread.InvokeAsync(() => Clear());
-                    await Task.Delay(ReadTime, token);
+                    await Task.Delay(Settings.SleepTime, token);
                     continue;
                 }
                 //取ATS
@@ -243,8 +241,8 @@ public partial class ContentViewModel : ViewModelBase
                         }
                     });
                 }
-                CardHelper.Beep(BeepSound);
-                await Task.Delay(ReadTime, token);
+                CardHelper.Beep(Settings.Sound);
+                await Task.Delay(Settings.SleepTime, token);
             }
         }
         catch (OperationCanceledException) { }
@@ -331,11 +329,11 @@ public partial class ContentViewModel : ViewModelBase
     // 添加日志
     public void AddLog(string msg)
     {
-        Dispatcher.UIThread.Invoke(() =>
+        Dispatcher.UIThread.Post(() =>
         {
-            LogDoc.Insert(LogDoc.TextLength, msg + Environment.NewLine); 
-            //滚动到最后一行
-            
+            LogDoc.Insert(
+                LogDoc.TextLength,
+                $"{msg}{Environment.NewLine}");
         });
     }
     // 显示消息框

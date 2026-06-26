@@ -89,6 +89,7 @@
                                 BorderBrush="Lavender">
                             <AvalonEdit:TextEditor Document="{Binding LogDoc}"
                                                    x:Name="logEditor"
+                                                   TextChanged="LogEditor_OnTextChanged"
                                                    HorizontalScrollBarVisibility="Auto"
                                                    VerticalScrollBarVisibility="Visible"
                                                    IsReadOnly="True"
