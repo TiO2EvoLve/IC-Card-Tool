@@ -1,3 +1,4 @@
+using System;
 using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
@@ -10,6 +11,10 @@ namespace D8_Demo.ViewModels;
 public partial class M1ReadViewModel : ViewModelBase
 {
     [ObservableProperty] private string passWorld = "FFFFFFFFFFFF";
+    [ObservableProperty] private bool pwdType = true;
+
+    public ObservableCollection<string> PassWorldOptions { get; set; } =
+        ["FFFFFFFFFFFF","000000000000","111111111111"];
     public static M1ReadViewModel Instance { get; } = new();
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
     private readonly CardHelper CardHelper = CardHelper.Instance;
@@ -45,10 +50,8 @@ public partial class M1ReadViewModel : ViewModelBase
         SelectedBlockData = Sectors[SelectedSectorIndex].Blocks[SelectedBlockIndex].Data;
         SelectedPosition = $"扇区{SelectedSectorIndex}，块{SelectedBlockIndex}";
     }
-
     [RelayCommand]
     private void Read() => _ = M1ReadSector();
-
     private async Task M1ReadSector()
     {
         if (!CardHelper.isConnected)
@@ -70,7 +73,7 @@ public partial class M1ReadViewModel : ViewModelBase
             for (byte j = 0; j < 4; j++)
             {
                 string blockContent;
-                if (CardHelper.AuthenticationPass(0x00, (byte)(4 * i + j), PassWorld))
+                if (CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04) ,(byte)(4 * i + j), PassWorld))
                 {
                     var raw = CardHelper.M1ReadSector((byte)(4 * i + j));
                     blockContent = raw.Length >= 32 ? raw.Substring(0, 32) : raw;
@@ -86,11 +89,8 @@ public partial class M1ReadViewModel : ViewModelBase
 
         RefreshSelectedDisplay();
     }
-
     [RelayCommand]
     public void Write() => _ = M1WriteSector();
-    
-
     private async Task M1WriteSector()
     {
         if (SelectedBlockData.Length != 32)
@@ -112,7 +112,7 @@ public partial class M1ReadViewModel : ViewModelBase
             return;
         }
 
-        if (!CardHelper.AuthenticationPass(0x00, (byte)(SelectedSectorIndex * 4 + SelectedBlockIndex), PassWorld))
+        if (!CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04), (byte)(SelectedSectorIndex * 4 + SelectedBlockIndex), PassWorld))
         {
             CVM.AddLog("密码验证错误");
             return;
@@ -128,4 +128,6 @@ public partial class M1ReadViewModel : ViewModelBase
         }
 
     }
+    
+    
 }

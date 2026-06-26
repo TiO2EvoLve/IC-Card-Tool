@@ -4,12 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              xmlns:vm="using:D8_Demo.ViewModels"
+             xmlns:converter="clr-namespace:D8_Demo.Converter"
              x:DataType="vm:M1ReadViewModel"
              x:Class="D8_Demo.Views.UserControl.M1ReadView">
     <Design.DataContext>
         <vm:M1ReadViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <converter:BoolToRadioConverter x:Key="BoolToRadioConverter"/>
+    </UserControl.Resources>
+    
     <UserControl.Styles>
         <Style Selector="Button.block-cell">
             <Setter Property="Background" Value="Transparent" />
@@ -32,13 +37,29 @@
     <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
-            <TextBox Width="200" Text="{Binding PassWorld}" />
+            <ComboBox Width="200" ItemsSource="{Binding PassWorldOptions}"
+                      SelectedItem="{Binding PassWorld, Mode=TwoWay}" />
             <Button Command="{Binding ReadCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
-            <Button Classes="Secondary">写入</Button>
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="10">
+                <RadioButton
+                    GroupName="PWD"
+                    Content="A密码"
+                    IsChecked="{Binding PwdType,
+                Converter={StaticResource BoolToRadioConverter},
+                ConverterParameter=True}" />
+
+                <RadioButton
+                    GroupName="PWD"
+                    Content="B密码"
+                    IsChecked="{Binding PwdType,
+                Converter={StaticResource BoolToRadioConverter},
+                ConverterParameter=False}" />
+            </StackPanel>
+            
         </StackPanel>
 
-
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Sectors}" Margin="5">
+        <Viewbox Grid.Row="1" HorizontalAlignment="Left">
+        <ItemsControl ItemsSource="{Binding Sectors}" Margin="5">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Spacing="8" />
@@ -55,7 +76,7 @@
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Blocks}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="4" />
+                                    <UniformGrid Columns="4" ColumnSpacing="5"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -74,10 +95,11 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        </Viewbox>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="块数据：" VerticalAlignment="Center" />
-            <TextBox MinWidth="300" Text="{Binding SelectedBlockData}" />
+            <TextBox MinWidth="300" Foreground="OrangeRed" Text="{Binding SelectedBlockData}" />
             <TextBlock Text="位置：" VerticalAlignment="Center" />
             <TextBlock Text="{Binding SelectedPosition}" VerticalAlignment="Center" Foreground="Blue" />
             <Button Content="写入" Command="{Binding WriteCommand}"/>

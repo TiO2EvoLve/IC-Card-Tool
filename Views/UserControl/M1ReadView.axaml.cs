@@ -1,4 +1,6 @@
-﻿namespace D8_Demo.Views.UserControl;
+﻿using Avalonia.Interactivity;
+
+namespace D8_Demo.Views.UserControl;
 
 public partial class M1ReadView : Avalonia.Controls.UserControl
 {
@@ -6,4 +8,5 @@ public partial class M1ReadView : Avalonia.Controls.UserControl
     {
         InitializeComponent();
     }
+    
 }
