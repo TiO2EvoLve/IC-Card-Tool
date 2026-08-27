@@ -40,6 +40,7 @@ public partial class CardCheckViewModel : ViewModelBase
             { "2165", "FM1280-2165" },
             { "165C1", "FM1280-165-C1" },
             { "102A1", "FM1280-102-A1" },
+            { "137C3", "FM1280-137-C3" },
         };
     private CancellationTokenSource? _cts;
     private Task? _runningTask;

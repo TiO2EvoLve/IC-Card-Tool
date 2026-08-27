@@ -53,5 +53,20 @@ public partial class PSAMReaderViewModel: ViewModelBase
     {
         await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
     }
-    
+
+    [RelayCommand]
+    private void Test()
+    {
+        if (!CardHelper.Reset() || CardHelper.FindCard() == 0)
+        {
+            Console.WriteLine("寻卡失败");
+        }
+        //复位ATS
+        if (CardHelper.ResetHex() == "")
+        {
+            Console.WriteLine("复位HEX失败");
+        }
+        var response = CardHelper.APDU("0084000008");
+        Console.WriteLine("随机数为                                                                                                                                                                         "+response);
+    }
 }

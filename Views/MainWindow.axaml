@@ -93,7 +93,8 @@
                                                    IsReadOnly="True"
                                                    FontWeight="Light"
                                                    Padding="20"
-                                                   Background="AliceBlue"
+                                                   Background="#2C2C2C"
+                                                   Foreground="WhiteSmoke"
                                                    FontSize="14"
                                                    ShowLineNumbers="True"
                                                    Watermark="暂没有日志">
