@@ -8,6 +8,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using D8_Demo.Enum;
 using D8_Demo.Models;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
@@ -44,6 +45,7 @@ public partial class CardCheckViewModel : ViewModelBase
             { "137C3", "FM1280-137-C3" },
         };
 
+    // 卡片对照表
     public ObservableCollection<CardTable> Tables { get; } = new()
     {
         new CardTable { Name = "S50", Atqa = "4", Sak = "08" },
@@ -53,6 +55,16 @@ public partial class CardCheckViewModel : ViewModelBase
     };
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
+    
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCpu))]
+    [NotifyPropertyChangedFor(nameof(IsM1))]
+    [NotifyPropertyChangedFor(nameof(IsUl))]
+    private CardCheckType cardCheckType = CardCheckType.Unknown;
+
+    public bool IsCpu => CardCheckType == CardCheckType.Cpu;
+    public bool IsM1  => CardCheckType == CardCheckType.M1;
+    public bool IsUl  => CardCheckType == CardCheckType.Ul;
     
     //TODO :发布时改为私有
     public CardCheckViewModel()
@@ -129,15 +141,19 @@ public partial class CardCheckViewModel : ViewModelBase
             //获取SAK
             var uid =  CardHelper.Anticoll();
             if(uid != "") SAK = CardHelper.Select(uid);
+            CardCheckType = SAK switch
+            {
+                "08" or "18" => CardCheckType.M1,
+                "00"         => CardCheckType.Ul,
+                "20"         => CardCheckType.Cpu,
+                 _            => CardCheckType.Unknown,
+            };
             //复位ATS
             var ats = CardHelper.ResetHex();
             if (ats == "")
             {
-                AddLog("复位ATS失败");
-                AddLog("卡片可能为M1卡或UL卡");
-                //为M1卡或UL卡
-                CardType = "M1卡或UL卡";
-                ATS = "M1卡或UL卡无ATS";
+                //继续判断是M1或UL卡
+                M1OrUL(ATQA, SAK);
                 Count++;
                 // 停止计时并记录
                 stopwatch.Stop();
@@ -206,11 +222,20 @@ public partial class CardCheckViewModel : ViewModelBase
             "4" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-10或FM1216-110" : "FM1208-76"),
             _ => Dispatcher.UIThread.InvokeAsync(() => CardType = "未知 FM1208 特征")
         };
+        ReturnValue = "该芯片类型无返回值";
     }
 
-    private void M1(String atqa, string ats)
+    private void M1OrUL(string atqa, string sak)
     {
-        
+        CardType = atqa switch
+        {
+            "44" when sak == "00" => "UL卡",
+            "4" when (sak == "08") => "M1 S50卡",
+            "4" when (sak == "18") => "M1 S70卡",
+            _ => "未知芯片型号"
+        };
+        ReturnValue = "该芯片类型无返回值";
+        ATS = "该芯片类型无ATS";
     }
     void Clear()
     {
@@ -219,6 +244,7 @@ public partial class CardCheckViewModel : ViewModelBase
         CardType = "";
         ATQA = "";
         SAK = "";
+        CardCheckType = CardCheckType.Unknown;
     }
 
     // 显示消息框

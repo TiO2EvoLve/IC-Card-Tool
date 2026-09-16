@@ -12,81 +12,139 @@
 
     <Grid Margin="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="20">
         <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
-        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="10">
-                <TextBlock Text="检测结果" FontSize="18" FontWeight="SemiBold"></TextBlock>
-            </StackPanel>
-            <StackPanel Grid.Row="0" Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
-                          Width="24" Height="24"
-                          Foreground="{Binding FindCard}" />
-                <Button Width="100" Height="40" Theme="{DynamicResource SolidButton}"
-                        Command="{Binding CheckChipTypeCommand}">
-                    开始检测
-                </Button>
-                <Button Width="100" Height="40" Classes="Warning" Command="{Binding StopChipTypeCommand}">停止检测</Button>
-            </StackPanel>
-            <Grid ColumnDefinitions="*,Auto" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnSpacing="20">
-                <ProgressBar Height="5" Background="Lavender"></ProgressBar>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20">
-                    <TextBlock Text="{Binding Count, StringFormat='已检测 {0} 轮'}"></TextBlock>
-                    <TextBlock Text="{Binding LastDuration, StringFormat='上次耗时 {0} ms'}" ></TextBlock>
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="10">
+                    <TextBlock Text="开始检测" FontSize="18" FontWeight="SemiBold"></TextBlock>
                 </StackPanel>
-               
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                            Spacing="10">
+                    <PathIcon Data="M 12,2A 10,10 0 1 1 11.999,2Z"
+                              Width="24" Height="24"
+                              Foreground="{Binding FindCard}" />
+                    <Button Width="100" Height="40" Theme="{DynamicResource SolidButton}"
+                            Command="{Binding CheckChipTypeCommand}">
+                        开始检测
+                    </Button>
+                    <Button Width="100" Height="40" Classes="Warning" Command="{Binding StopChipTypeCommand}">停止检测</Button>
+                </StackPanel>
+                <Grid ColumnDefinitions="*,Auto" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnSpacing="20">
+                    <ProgressBar Height="5" Background="Lavender"></ProgressBar>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20">
+                        <TextBlock Text="{Binding Count, StringFormat='已检测 {0} 轮'}"></TextBlock>
+                        <TextBlock Text="{Binding LastDuration, StringFormat='上次耗时 {0} ms'}"></TextBlock>
+                    </StackPanel>
+
+                </Grid>
             </Grid>
-        </Grid>
         </Border>
         
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10">
-            <Border  BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+            <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
                 <StackPanel Grid.Row="0" HorizontalAlignment="Left" Spacing="10">
-                <TextBlock Text="芯片对照表" FontSize="18" FontWeight="SemiBold"></TextBlock>
-                <DataGrid ItemsSource="{Binding Tables}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          GridLinesVisibility="All"
-                          VerticalAlignment="Center"
-                          Margin="12">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="卡片" Binding="{Binding Name}" Width="*"/>
-                        <DataGridTextColumn Header="ATQA" Binding="{Binding Atqa}" Width="*"/>
-                        <DataGridTextColumn Header="SAK"  Binding="{Binding Sak}"  Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                    <TextBlock Text="芯片对照表" FontSize="18" FontWeight="SemiBold"></TextBlock>
+                    <DataGrid ItemsSource="{Binding Tables}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              VerticalAlignment="Center"
+                              Margin="12">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="卡片" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="ATQA" Binding="{Binding Atqa}" Width="*" />
+                            <DataGridTextColumn Header="SAK" Binding="{Binding Sak}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </StackPanel>
             </Border>
-            <Border Grid.Column="1"  BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+            <Border Grid.Column="1" BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
                 <Grid RowDefinitions="Auto,*" RowSpacing="20">
                     <StackPanel Grid.Row="0" HorizontalAlignment="Left" Spacing="10">
                         <TextBlock Text="检测结果" FontSize="18" FontWeight="SemiBold"></TextBlock>
-                        <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green"
-                               FontWeight="Bold" 
+                        <Label HorizontalContentAlignment="Center" Classes="Ghost Large Blue"
+                               FontWeight="Bold"
+                               FontSize="16"
                                MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}"
                                Content="{Binding CardType}">
                         </Label>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Spacing="20">
-                        <Grid ColumnDefinitions="*,5*" >
-                            <TextBlock Text="RES: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                        <Grid ColumnDefinitions="*,5*">
+                            <TextBlock Text="返回值: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBox Grid.Column="1" MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
                         </Grid>
-                        <Grid ColumnDefinitions="*,5*" >
+                        <Grid ColumnDefinitions="*,5*">
                             <TextBlock Text="ATS: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBox Grid.Column="1" MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
                         </Grid>
-                        <Grid ColumnDefinitions="*,2*,*,2*" >
+                        <Grid ColumnDefinitions="*,2*,*,2*">
                             <TextBlock Text="ATQA: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                             <TextBox Grid.Column="1" Text="{Binding ATQA}" IsReadOnly="True" MinWidth="100"></TextBox>
-                            <TextBlock Grid.Column="2" Text="SAK: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock Grid.Column="2" Text="SAK: " HorizontalAlignment="Center"
+                                       VerticalAlignment="Center">
+                            </TextBlock>
                             <TextBox Grid.Column="3" Text="{Binding SAK}" IsReadOnly="True" MinWidth="100"></TextBox>
                         </Grid>
-                        
+
                     </StackPanel>
-                   
+
                 </Grid>
             </Border>
         </Grid>
-
+        <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+            <TextBlock Text="判定结果:" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" ></TextBlock>
+            <StackPanel.Styles>
+                <!-- 默认（未选中）状态 -->
+                <Style Selector="Border.chip">
+                    <Setter Property="Background" Value="#F0F0F0" />
+                    <Setter Property="BorderBrush" Value="#D8D8D8" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="6" />
+                    <Setter Property="Padding" Value="20,10" />
+                    <Setter Property="MinWidth" Value="110" />
+                    <Setter Property="RenderTransform" Value="scale(1.0)" />
+                    <Setter Property="Transitions">
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="0:0:0.18" />
+                            <BrushTransition Property="BorderBrush" Duration="0:0:0.18" />
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.18" />
+                        </Transitions>
+                    </Setter>
+                </Style>
+                <Style Selector="Border.chip > TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="Foreground" Value="#909090" />
+                </Style>
+                <!-- 选中状态：换底色 + 加粗 + 放大 + 外发光 -->
+                <Style Selector="Border.chip.active">
+                    <Setter Property="Background" Value="DodgerBlue" />
+                    <Setter Property="BorderBrush" Value="Lavender" />
+                    <Setter Property="RenderTransform" Value="scale(1.08)" />
+                    <Setter Property="BoxShadow" Value="0 2 12 0 #661E88E5" />
+                    <Style.Animations>
+                        <Animation Duration="0:0:1.2" IterationCount="INFINITE">
+                            <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+                            <KeyFrame Cue="50%"><Setter Property="Opacity" Value="0.75"/></KeyFrame>
+                            <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+                <Style Selector="Border.chip.active > TextBlock">
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="FontSize" Value="16" />
+                </Style>
+            </StackPanel.Styles>
+            <Border Classes="chip" Classes.active="{Binding IsCpu}">
+                <TextBlock Text="CPU卡" />
+            </Border>
+            <Border Classes="chip" Classes.active="{Binding IsM1}">
+                <TextBlock Text="M1卡" />
+            </Border>
+            <Border Classes="chip" Classes.active="{Binding IsUl}">
+                <TextBlock Text="UL卡" />
+            </Border>
+        </StackPanel>
     </Grid>
 
 </UserControl>
