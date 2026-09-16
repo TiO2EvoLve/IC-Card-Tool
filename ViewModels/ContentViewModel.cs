@@ -172,9 +172,10 @@ public partial class ContentViewModel : ViewModelBase
                     var uid16_ = CardUid.ToString("X");
                     var uid16 = Tools.ChangeHexPairs(uid16_);
                     var uid10 = Convert.ToUInt32(uid16, 16).ToString();
-
+                    var uid10_ = Convert.ToUInt32(uid16_, 16).ToString();
+                    
                     await Dispatcher.UIThread.InvokeAsync(() => {
-                        Uid10_ = uid16_;
+                        Uid10_ = uid10_;
                         Uid16_ = uid16_;
                         Uid16 = uid16;
                         Uid10 = uid10;

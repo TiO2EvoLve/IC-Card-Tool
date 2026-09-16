@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,8 +20,8 @@ public partial class CardCheckViewModel : ViewModelBase
     [ObservableProperty] private string? returnValue;//返回值
     [ObservableProperty] private string? cardType = "未检测到卡片";
     [ObservableProperty] private string? aTS = "";//ATS
-    [ObservableProperty] private string? feature1 = "";//特征1
-    [ObservableProperty] private string? feature2 = "";//特征2
+    [ObservableProperty] private string? aTQA = "";//ATQA
+    [ObservableProperty] private string? sAK = "";//SAK
     [ObservableProperty]private int lastDuration;//上次耗时
     [ObservableProperty]private int count;//计数
     
@@ -42,10 +43,16 @@ public partial class CardCheckViewModel : ViewModelBase
             { "102A1", "FM1280-102-A1" },
             { "137C3", "FM1280-137-C3" },
         };
+
+    public ObservableCollection<CardTable> Tables { get; } = new()
+    {
+        new CardTable { Name = "S50", Atqa = "4", Sak = "08" },
+        new CardTable { Name = "S70", Atqa = "4", Sak = "18" },
+        new CardTable { Name = "UL", Atqa = "44", Sak = "00" },
+        new CardTable { Name = "CPU", Atqa = "8", Sak = "20" },
+    };
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
-    
-    
     
     //TODO :发布时改为私有
     public CardCheckViewModel()
@@ -117,6 +124,11 @@ public partial class CardCheckViewModel : ViewModelBase
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
+            //获取ATQA
+            ATQA = CardHelper.Request();
+            //获取SAK
+            var uid =  CardHelper.Anticoll();
+            if(uid != "") SAK = CardHelper.Select(uid);
             //复位ATS
             var ats = CardHelper.ResetHex();
             if (ats == "")
@@ -125,6 +137,11 @@ public partial class CardCheckViewModel : ViewModelBase
                 AddLog("卡片可能为M1卡或UL卡");
                 //为M1卡或UL卡
                 CardType = "M1卡或UL卡";
+                ATS = "M1卡或UL卡无ATS";
+                Count++;
+                // 停止计时并记录
+                stopwatch.Stop();
+                LastDuration = (int)stopwatch.ElapsedMilliseconds;
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
@@ -137,11 +154,6 @@ public partial class CardCheckViewModel : ViewModelBase
                 ReturnValue = "空";
                 continue;
             }
-            //获取特征值1
-            Feature1 = CardHelper.Request();
-            //获取特征值2
-            var uid =  CardHelper.Anticoll();
-            if(uid != "") Feature2 = CardHelper.Select(uid);
             if (response.EndsWith("9000"))
             {
                 ReturnValue = response;
@@ -150,7 +162,7 @@ public partial class CardCheckViewModel : ViewModelBase
             }else
             {
                 //芯片为1208
-                FM1208(Feature1,ATS);
+                FM1208(ATQA,ATS);
             }
             FindCard = Brushes.Red;
             CardHelper.Beep(Settings.Sound);
@@ -174,22 +186,20 @@ public partial class CardCheckViewModel : ViewModelBase
                 break;
             }
         }
-
         // 确保在 UI 线程更新属性
         _ = Dispatcher.UIThread.InvokeAsync(() => CardType = result);
     }
 
-    private void FM1208(string feature, string ats)
+    private void FM1208(string atqa, string ats)
     {
         if (string.IsNullOrEmpty(ats) || ats.Length < 16)
         {
             _ = Dispatcher.UIThread.InvokeAsync(() => CardType = "无法解析 ATS");
             return;
         }
-
         var core = ats.Substring(ats.Length - 16, 8); // safe now
         var isZero = core == "00000000";
-        _ = feature switch
+        _ = atqa switch
         {
             "8" => Dispatcher.UIThread.InvokeAsync(() =>
                 CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
@@ -198,13 +208,17 @@ public partial class CardCheckViewModel : ViewModelBase
         };
     }
 
+    private void M1(String atqa, string ats)
+    {
+        
+    }
     void Clear()
     {
         ReturnValue = "";
         ATS = "";
         CardType = "";
-        Feature1 = "";
-        Feature2 = "";
+        ATQA = "";
+        SAK = "";
     }
 
     // 显示消息框

@@ -38,35 +38,51 @@
         </Border>
         
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10">
-            <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+            <Border  BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
+                <StackPanel Grid.Row="0" HorizontalAlignment="Left" Spacing="10">
+                <TextBlock Text="芯片对照表" FontSize="18" FontWeight="SemiBold"></TextBlock>
+                <DataGrid ItemsSource="{Binding Tables}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"
+                          VerticalAlignment="Center"
+                          Margin="12">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="卡片" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="ATQA" Binding="{Binding Atqa}" Width="*"/>
+                        <DataGridTextColumn Header="SAK"  Binding="{Binding Sak}"  Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                </StackPanel>
             </Border>
             <Border Grid.Column="1"  BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto" >
+                <Grid RowDefinitions="Auto,*" RowSpacing="20">
                     <StackPanel Grid.Row="0" HorizontalAlignment="Left" Spacing="10">
-                        <TextBlock Text="卡片检测" FontSize="18" FontWeight="SemiBold"></TextBlock>
+                        <TextBlock Text="检测结果" FontSize="18" FontWeight="SemiBold"></TextBlock>
                         <Label HorizontalContentAlignment="Center" Classes="Ghost Large Green"
                                FontWeight="Bold" 
                                MinWidth="200" MinHeight="40" Theme="{DynamicResource TagLabel}"
                                Content="{Binding CardType}">
                         </Label>
                     </StackPanel>
-                    <StackPanel Grid.Row="1" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
-                        <TextBlock Text="卡返回值：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                        <TextBox MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
+                    <StackPanel Grid.Row="1" Spacing="20">
+                        <Grid ColumnDefinitions="*,5*" >
+                            <TextBlock Text="RES: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBox Grid.Column="1" MinWidth="400" Text="{Binding ReturnValue}" IsReadOnly="True"></TextBox>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,5*" >
+                            <TextBlock Text="ATS: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBox Grid.Column="1" MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,2*,*,2*" >
+                            <TextBlock Text="ATQA: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBox Grid.Column="1" Text="{Binding ATQA}" IsReadOnly="True" MinWidth="100"></TextBox>
+                            <TextBlock Grid.Column="2" Text="SAK: " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <TextBox Grid.Column="3" Text="{Binding SAK}" IsReadOnly="True" MinWidth="100"></TextBox>
+                        </Grid>
+                        
                     </StackPanel>
-                    <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
-                        <TextBlock Text="复位信息：" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                        <TextBox MinWidth="400" Text="{Binding ATS}" IsReadOnly="True"></TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="3" Spacing="10" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
-                        <TextBlock Text="特征值1：" VerticalAlignment="Center"></TextBlock>
-                        <TextBox Text="{Binding Feature1}" IsReadOnly="True" MinWidth="100"></TextBox>
-                        <TextBlock Text="特征值2：" VerticalAlignment="Center"></TextBlock>
-                        <TextBox Text="{Binding Feature2}" IsReadOnly="True" MinWidth="100"></TextBox>
-                    </StackPanel>
-
-
+                   
                 </Grid>
             </Border>
         </Grid>
