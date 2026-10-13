@@ -217,8 +217,7 @@ public partial class CardCheckViewModel : ViewModelBase
         var isZero = core == "00000000";
         _ = atqa switch
         {
-            "8" => Dispatcher.UIThread.InvokeAsync(() =>
-                CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
+            "8" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
             "4" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-10或FM1216-110" : "FM1208-76"),
             _ => Dispatcher.UIThread.InvokeAsync(() => CardType = "未知 FM1208 特征")
         };

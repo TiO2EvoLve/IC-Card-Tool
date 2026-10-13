@@ -169,19 +169,13 @@ public partial class ContentViewModel : ViewModelBase
                         Status = State.读卡中;
                     });
                     
-                    var uid16_ = CardUid.ToString("X");
-                    var uid16 = Tools.ChangeHexPairs(uid16_);
-                    var uid10 = Convert.ToUInt32(uid16, 16).ToString();
-                    var uid10_ = Convert.ToUInt32(uid16_, 16).ToString();
-                    
                     await Dispatcher.UIThread.InvokeAsync(() => {
-                        Uid10_ = uid10_;
-                        Uid16_ = uid16_;
-                        Uid16 = uid16;
-                        Uid10 = uid10;
+                        Uid16_ = CardUid.ToString("X").PadLeft(8, '0');
+                        Uid16 = Tools.ChangeHexPairs(Uid16_).PadLeft(8, '0');
+                        Uid10 = Convert.ToUInt32(Uid16, 16).ToString();
+                        Uid10_ = Convert.ToUInt32(Uid16_, 16).ToString();
                         AddLog($"发现卡片:{Uid16}");
                     });
-                    
                 }
                 else
                 {
@@ -197,8 +191,6 @@ public partial class ContentViewModel : ViewModelBase
                         Status = State.非CPU卡;
                         Ats = "非CPU卡";
                     });
-                    await Task.Delay(500, token);
-                    continue;
                 }
 
                 //判断是否为同一张卡
@@ -249,7 +241,7 @@ public partial class ContentViewModel : ViewModelBase
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => AddLog("RunLoop 出错:" + ex.Message));
+            await Dispatcher.UIThread.InvokeAsync(() => AddLog("读取错误：" + ex.Message));
         }
         finally
         {

@@ -11,6 +11,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public CardCheckViewModel CardCheckVm { get; } = CardCheckViewModel.Instance;
     public M1ReadViewModel M1ReadVm { get; } = M1ReadViewModel.Instance;
     public PSAMReaderViewModel PSAMVm { get; } = PSAMReaderViewModel.Instance;
+    public CheckErrorViewModel CheckErrorVm { get; } = CheckErrorViewModel.Instance;
 
 
     private int _selectedTabIndex;

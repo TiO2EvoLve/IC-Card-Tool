@@ -126,6 +126,9 @@
                     <TabItem Header="M1读写">
                         <userControl:M1ReadView DataContext="{Binding M1ReadVm}" />
                     </TabItem>
+                    <TabItem Header="坏卡分析">
+                        <userControl:CheckErrorView DataContext="{Binding CheckErrorVm}" />
+                    </TabItem>
                     <TabItem Header="PSAM读写">
                         <userControl:PSAMReader DataContext="{Binding PSAMVm}" />
                     </TabItem>

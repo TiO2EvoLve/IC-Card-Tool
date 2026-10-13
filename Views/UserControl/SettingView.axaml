@@ -5,14 +5,13 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:SettingsViewModel"
-             xmlns:u="https://irihi.tech/ursa"
              x:Class="D8_Demo.Views.UserControl.SettingView">
 
     <Design.DataContext>
         <vm:SettingsViewModel />
     </Design.DataContext>
 
-    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="20">
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="20">
         <Border BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
             <DockPanel>
                 <TextBlock Text="主题" VerticalAlignment="Center" FontWeight="Bold" />
@@ -20,19 +19,8 @@
                           SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
             </DockPanel>
         </Border>
-        
+
         <Border Grid.Row="1" BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
-            <DockPanel>
-                <TextBlock Text="窗口大小" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                    <TextBlock Text="长" VerticalAlignment="Center"></TextBlock>
-                    <TextBox Text="800" VerticalAlignment="Center"></TextBox>
-                    <TextBlock Text="高" VerticalAlignment="Center"></TextBlock>
-                    <TextBox Text="1920" VerticalAlignment="Center"></TextBox>
-                </StackPanel>
-            </DockPanel>
-        </Border>
-        <Border Grid.Row="2" BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
             <DockPanel>
                 <TextBlock Text="卡片读取间隔(ms)" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
@@ -41,11 +29,18 @@
                 </StackPanel>
             </DockPanel>
         </Border>
-        
-        <Border Grid.Row="3" BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
+
+        <Border Grid.Row="2" BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
             <DockPanel>
                 <TextBlock Text="读卡器声音" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
                 <ToggleSwitch OnContent="开" OffContent="关" IsChecked="{Binding Sound}" HorizontalAlignment="Right"></ToggleSwitch>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="3" BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
+            <DockPanel>
+                <TextBlock Text="Mica主题" VerticalAlignment="Center" FontWeight="Bold"></TextBlock>
+                <ToggleSwitch OnContent="开" OffContent="关" IsChecked="{Binding EnableMica}" HorizontalAlignment="Right"></ToggleSwitch>
             </DockPanel>
         </Border>
 
