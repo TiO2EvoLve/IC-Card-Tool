@@ -1,9 +1,21 @@
 ﻿using System;
+using System.IO;
+using System.Security.Cryptography;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace D8_Demo.Tool;
 
 public class Tools
 {
+    /// <summary>
+    /// 将十六进制字符串的字节对顺序颠倒
+    /// </summary>
+    /// <param name="hex"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static string ChangeHexPairs(string hex)
     {
         if (hex.Length % 2 != 0) throw new ArgumentException("数据位数不合法");
@@ -16,6 +28,12 @@ public class Tools
         }
         return new string(reversedHex);
     }
+    /// <summary>
+    /// 将十六进制字符串转换为字节数组
+    /// </summary>
+    /// <param name="hexStr"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static byte[] HexStringToBytes(string hexStr)
     {
         if (string.IsNullOrEmpty(hexStr) || hexStr.Length % 2 != 0)
@@ -35,16 +53,18 @@ public class Tools
         return bytes;
     }
     
-    //字符串转16进制字节数组 
-    public static byte[] strToHexByte(string hexString)
+    public static byte[] DesEncrypt(byte[] data, byte[] key8, byte[] iv = null)
     {
-        hexString = hexString.Replace(" ", "");
-        if ((hexString.Length % 2) != 0)
-            hexString += " ";
-        byte[] returnBytes = new byte[hexString.Length / 2];
-        for (int i = 0; i < returnBytes.Length; i++)
-            returnBytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
-        return returnBytes;
+        iv ??= new byte[8];
+        var engine = new DesEngine();                    // 单 DES
+        var cipher = new CbcBlockCipher(engine);
+        var padded = new PaddedBufferedBlockCipher(cipher, new ZeroBytePadding());
+
+        padded.Init(true, new ParametersWithIV(new DesParameters(key8), iv));
+        byte[] output = new byte[padded.GetOutputSize(data.Length)];
+        int len = padded.ProcessBytes(data, 0, data.Length, output, 0);
+        padded.DoFinal(output, len);
+        return output;
     }
-    
+
 }

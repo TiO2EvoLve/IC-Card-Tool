@@ -17,15 +17,14 @@ public partial class CheckErrorViewModel
         {
             return;
         }
-        var ats = CardHelper.ResetHex();
-        
+        var hex = CardHelper.ResetHex();
         string strRandom = CardHelper.APDU("0084000008");
-        if (strRandom.Length < 16) throw new Exception("外部认证未通过！随机数错误：" + strRandom);
+        if (strRandom.Length !=20) throw new Exception("外部认证未通过！随机数错误：" + strRandom);
         strRandom = strRandom[..16];
-        string EnRandom = MathHelper.DES_Encrypt(strRandom, "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-        string strCommand = "0082000008" + EnRandom;
-        string strResult = CardHelper.APDU(strCommand);
-        string st = strResult.Substring(strResult.Length - 4, 4);
+        var data = Tools.DesEncrypt(Tools.HexStringToBytes(strRandom), Tools.HexStringToBytes("FFFFFFFFFFFFFFFF"));
+        string strCommand = "0082000008" + Convert.ToHexString(data);
+        Console.WriteLine(strCommand);
+        string st= CardHelper.APDU(strCommand);
         Console.WriteLine(st);
     }
 }

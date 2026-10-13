@@ -275,7 +275,7 @@ public class CardHelper
     public bool M1WriteSector(int address, string data)
     {
         address = Convert.ToInt16(address);
-        if(dc_write(icdev, address, Tools.strToHexByte(data)) == 0)
+        if(dc_write(icdev, address, Tools.HexStringToBytes(data)) == 0)
         {
             return true;
         }
