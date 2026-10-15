@@ -11,8 +11,7 @@ public class CardHelper
     [DllImport("dcrf32.dll")] private static extern int dc_init(short port, int baud);//打开端口
     [DllImport("dcrf32.dll")] private static extern int dc_exit(int icdev);//关闭端口
     [DllImport("dcrf32.dll")]
-    private static extern short dc_pro_commandlink_hex(int icdev, byte slen, ref byte sendbuffer, ref byte rlen,
-        ref byte databuffer, byte timeout); //发指令
+    public static extern short dc_pro_commandlinkInt_hex(int idComDev, uint slen, ref byte sendbuffer, ref uint rlen, ref byte databuffer, char timeout); //发指令
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_reset(int icdev, uint sec); //复位
@@ -90,10 +89,10 @@ public class CardHelper
     public string APDU(string sendbuffer)
     {
         byte[] sbuff = Encoding.ASCII.GetBytes(sendbuffer);
-        byte len = (byte)(sbuff.Count() / 2);
-        byte rlen = 1;
+        byte len = (byte)(sbuff.Length / 2);
+        uint rlen = 1;
         byte[] rbuff = new byte[64];
-        int st = dc_pro_commandlink_hex(icdev, len, ref sbuff[0], ref rlen, ref rbuff[0], 3);
+        int st = dc_pro_commandlinkInt_hex(icdev, len, ref sbuff[0], ref rlen, ref rbuff[0], (char)7);
         if (st != 0)
         {
             return null;
@@ -107,6 +106,7 @@ public class CardHelper
 
         return strrbuff;
     }
+   
     //向接触式卡发指令
     public string PSAMAPDU(string hexString)
     {

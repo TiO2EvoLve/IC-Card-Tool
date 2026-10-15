@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Engines;
-using Org.BouncyCastle.Crypto.Modes;
-using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace D8_Demo.Tool;
@@ -53,17 +50,30 @@ public class Tools
         return bytes;
     }
     
-    public static byte[] DesEncrypt(byte[] data, byte[] key8, byte[] iv = null)
+    /// 3DES加密
+    /// <summary>
+    /// 3DES 加密（ECB 模式，无填充）—— 智能卡场景常用
+    /// </summary>
+    /// <param name="key">24字节密钥</param>
+    /// <param name="data">8字节倍数的明文</param>
+    /// <returns>密文</returns>
+    public static byte[] EncryptEcb(byte[] data, byte[] key)
     {
-        iv ??= new byte[8];
-        var engine = new DesEngine();                    // 单 DES
-        var cipher = new CbcBlockCipher(engine);
-        var padded = new PaddedBufferedBlockCipher(cipher, new ZeroBytePadding());
+        if (key.Length == 8)
+        {
+            byte[] k24 = new byte[24];
+            Array.Copy(key, 0, k24, 0, 8);
+            Array.Copy(key, 0, k24, 8, 8);
+            Array.Copy(key, 0, k24, 16, 8);
+            key = k24;
+        }
 
-        padded.Init(true, new ParametersWithIV(new DesParameters(key8), iv));
-        byte[] output = new byte[padded.GetOutputSize(data.Length)];
-        int len = padded.ProcessBytes(data, 0, data.Length, output, 0);
-        padded.DoFinal(output, len);
+        var engine = new DesEdeEngine();
+        engine.Init(true, new KeyParameter(key));
+
+        byte[] output = new byte[data.Length];
+        for (int i = 0; i < data.Length; i += 8)
+            engine.ProcessBlock(data, i, output, i);
         return output;
     }
 

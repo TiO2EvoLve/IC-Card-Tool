@@ -9,6 +9,11 @@
     <Design.DataContext>
         <vm:CheckErrorViewModel />
     </Design.DataContext>
+    <Grid>
+        <StackPanel>
+            <Button Content="外部认证" Command="{Binding CheckErrorCommand}"></Button>
+        </StackPanel>
+        
+    </Grid>
     
-    <Button Content="外部认证" Command="{Binding CheckErrorCommand}"></Button>
 </UserControl>
