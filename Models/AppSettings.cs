@@ -7,8 +7,6 @@ public class AppSettings
     public bool Sound { get; set; }
     public bool EnableMica { get; set; }
 
-    public static AppSettings Instance { get; set; } = new();
-
     public void Reset()
     {
         Theme = "Default";

@@ -10,19 +10,24 @@ using MsBox.Avalonia;
 
 namespace D8_Demo.ViewModels;
 
-public partial class PSAMReaderViewModel: ViewModelBase
+public partial class PSAMReaderViewModel : ViewModelBase
 {
     //端口号
     [ObservableProperty] private int port = 100;
+
     //波特率
     [ObservableProperty] private int hz = 115200;
     [ObservableProperty] private string psamData = "0084000010";
+
     [ObservableProperty] private string resData = "";
+
     //卡片帮助类
-    private readonly CardHelper CardHelper = CardHelper.Instance;
-    public static PSAMReaderViewModel Instance { get; } = new();
-    //TODO :发布时改为私有
-    public PSAMReaderViewModel() { }
+    private readonly CardHelper CardHelper;
+
+    public PSAMReaderViewModel(CardHelper cardHelper)
+    {
+        CardHelper = cardHelper;
+    }
 
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
@@ -48,6 +53,7 @@ public partial class PSAMReaderViewModel: ViewModelBase
         // no continuous loop to stop, keep compatibility
         return Task.CompletedTask;
     }
+
     // 显示消息框
     async Task ShowMessage(string title, string message)
     {
@@ -61,12 +67,16 @@ public partial class PSAMReaderViewModel: ViewModelBase
         {
             Console.WriteLine("寻卡失败");
         }
+
         //复位ATS
         if (CardHelper.ResetHex() == "")
         {
             Console.WriteLine("复位HEX失败");
         }
+
         var response = CardHelper.APDU("0084000008");
-        Console.WriteLine("随机数为                                                                                                                                                                         "+response);
+        Console.WriteLine(
+            "随机数为                                                                                                                                                                         " +
+            response);
     }
 }

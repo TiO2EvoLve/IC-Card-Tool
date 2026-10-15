@@ -5,18 +5,23 @@ namespace D8_Demo.ViewModels;
 
 public partial class MenuViewModel : ViewModelBase
 {
-    private readonly ContentViewModel ContentVM = ContentViewModel.Instance;
-    
+    private readonly ContentViewModel _contentViewModel;
+
+    public MenuViewModel(ContentViewModel contentViewModel)
+    {
+        _contentViewModel = contentViewModel;
+    }
+
     [RelayCommand]
     private void Open()
     {
-        _ = ContentVM.OpenPort();
+        _ = _contentViewModel.OpenPort();
     }
 
     [RelayCommand]
     private void Close()
     {
-        _ = ContentVM.ClosePort();
+        _ = _contentViewModel.ClosePort();
     }
 
     [RelayCommand]

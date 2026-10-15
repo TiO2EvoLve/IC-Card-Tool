@@ -10,7 +10,7 @@ namespace D8_Demo.Tool;
 public class Mdb
 {
     //批量执行sql
-    public static async Task ExecuteBatch(string filePath, List<string> sqls)
+    public async Task ExecuteBatch(string filePath, List<string> sqls)
     {
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
@@ -39,8 +39,9 @@ public class Mdb
             }
         });
     }
+
     //执行查找并将数据返回
-    public static  List<string> Select(string filePath, string sql)
+    public List<string> Select(string filePath, string sql)
     {
         var _connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};";
 
@@ -69,7 +70,7 @@ public class Mdb
     }
 
     //执行sql语句不返回数据，可以支持增删改
-    public static async Task<bool> Execute(string filePath, string sql)
+    public async Task<bool> Execute(string filePath, string sql)
     {
         var _connectionString = $@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};";
 
@@ -88,8 +89,7 @@ public class Mdb
                 throw new Exception(ex.Message);
             }
         }
+
         return true;
     }
-  
-    
 }

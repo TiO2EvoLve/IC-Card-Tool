@@ -9,20 +9,25 @@ public class SettingsManage
 {
     private static readonly string FilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
 
-    public static AppSettings Settings  = AppSettings.Instance;
+    public AppSettings Settings { get; private set; }
 
-    static SettingsManage() => Load();
+    public SettingsManage()
+    {
+        Settings = Load();
+    }
 
-    private static void Load()
+    private static AppSettings Load()
     {
         if (File.Exists(FilePath))
         {
             var json = File.ReadAllText(FilePath);
-            Settings = JsonSerializer.Deserialize<AppSettings>(json) ?? AppSettings.Instance;
+            return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
         }
+
+        return new AppSettings();
     }
 
-    public static void Save()
+    public void Save()
     {
         var json = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(FilePath, json);

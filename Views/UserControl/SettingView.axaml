@@ -7,10 +7,6 @@
              x:DataType="vm:SettingsViewModel"
              x:Class="D8_Demo.Views.UserControl.SettingView">
 
-    <Design.DataContext>
-        <vm:SettingsViewModel />
-    </Design.DataContext>
-
     <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="20">
         <Border BorderThickness="1" BorderBrush="Gainsboro" Padding="10" CornerRadius="10">
             <DockPanel>

@@ -13,10 +13,6 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="D8读卡器工具">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
-
     <DockPanel LastChildFill="True">
 
         <!-- 顶部菜单栏 -->

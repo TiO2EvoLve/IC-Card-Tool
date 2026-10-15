@@ -1,7 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Media;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,15 +16,18 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private bool sound;
     [ObservableProperty] private bool enableMica;
 
-    private readonly AppSettings Settings = AppSettings.Instance;
+    private readonly SettingsManage _settingsManage;
+    private readonly AppSettings Settings;
     public string[] Themes { get; } = ["Light", "Dark", "Default"];
 
-    public SettingsViewModel()
+    public SettingsViewModel(SettingsManage settingsManage)
     {
-        SelectedTheme = SettingsManage.Settings.Theme;
-        SleepTime = SettingsManage.Settings.SleepTime;
-        Sound = SettingsManage.Settings.Sound;
-        EnableMica = SettingsManage.Settings.EnableMica;
+        _settingsManage = settingsManage;
+        Settings = settingsManage.Settings;
+        SelectedTheme = Settings.Theme;
+        SleepTime = Settings.SleepTime;
+        Sound = Settings.Sound;
+        EnableMica = Settings.EnableMica;
 
         Settings.Theme = SelectedTheme;
         Settings.SleepTime = SleepTime;
@@ -36,16 +37,14 @@ public partial class SettingsViewModel : ViewModelBase
         SetTheme(SelectedTheme);
     }
 
-    public static SettingsViewModel Instance { get; } = new();
-
     [RelayCommand]
     private void Save(Window window)
     {
-        SettingsManage.Settings.Theme = SelectedTheme;
-        SettingsManage.Settings.SleepTime = SleepTime;
-        SettingsManage.Settings.Sound = Sound;
-        SettingsManage.Settings.EnableMica = EnableMica;
-        SettingsManage.Save();
+        Settings.Theme = SelectedTheme;
+        Settings.SleepTime = SleepTime;
+        Settings.Sound = Sound;
+        Settings.EnableMica = EnableMica;
+        _settingsManage.Save();
 
         SetTheme(SelectedTheme);
         Settings.Theme = SelectedTheme;
@@ -66,23 +65,10 @@ public partial class SettingsViewModel : ViewModelBase
         Save(window);
     }
 
-    private void ApplyWindowTransparency(Window? window)
+    private void ApplyWindowTransparency(Window window)
     {
-        var targetWindow = window ?? MainWindow.Current;
-        if (targetWindow is null)
-        {
-            return;
-        }
-
-        targetWindow.TransparencyLevelHint = EnableMica
-            ? [WindowTransparencyLevel.Mica]
-            : [];
-
-        targetWindow.Background = EnableMica
-            ? new SolidColorBrush(Colors.Transparent)
-            : new SolidColorBrush(Colors.White);
-
-        targetWindow.InvalidateVisual();
+        if (window is MainWindow mainWindow)
+            mainWindow.ApplyMicaSetting(EnableMica);
     }
 
     private void SetTheme(string themeName)

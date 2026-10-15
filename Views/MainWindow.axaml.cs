@@ -3,25 +3,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
-using D8_Demo.Tool;
 
 namespace D8_Demo.Views;
 
 public partial class MainWindow : Window
 {
-    public static MainWindow? Current { get; private set; }
-
     public MainWindow()
     {
         InitializeComponent();
-        Current = this;
-        ApplyMicaSetting();
     }
 
-    public void ApplyMicaSetting(bool? enableMica = null)
+    public void ApplyMicaSetting(bool shouldEnableMica)
     {
-        var shouldEnableMica = enableMica ?? SettingsManage.Settings.EnableMica;
-
         TransparencyLevelHint = shouldEnableMica
             ? [WindowTransparencyLevel.Mica]
             : [];

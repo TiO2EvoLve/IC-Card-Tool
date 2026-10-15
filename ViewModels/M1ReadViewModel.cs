@@ -14,20 +14,22 @@ public partial class M1ReadViewModel : ViewModelBase
     [ObservableProperty] private bool pwdType = true;
 
     public ObservableCollection<string> PassWorldOptions { get; set; } =
-        ["FFFFFFFFFFFF","000000000000","111111111111"];
-    public static M1ReadViewModel Instance { get; } = new();
+        ["FFFFFFFFFFFF", "000000000000", "111111111111"];
+
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
-    private readonly CardHelper CardHelper = CardHelper.Instance;
-    private readonly ContentViewModel CVM = ContentViewModel.Instance;
+    private readonly CardHelper CardHelper;
+    private readonly ContentViewModel CVM;
     //日志内容
-    
+
     [ObservableProperty] private string selectedBlockData = "";
     [ObservableProperty] private string selectedPosition = "未选择";
     [ObservableProperty] private int selectedSectorIndex = -1;
     [ObservableProperty] private int selectedBlockIndex = -1;
 
-    public M1ReadViewModel()
+    public M1ReadViewModel(CardHelper cardHelper, ContentViewModel contentViewModel)
     {
+        CardHelper = cardHelper;
+        CVM = contentViewModel;
         for (int i = 0; i < 16; i++)
             Sectors.Add(new SectorViewModel(i, this));
     }
@@ -47,11 +49,14 @@ public partial class M1ReadViewModel : ViewModelBase
             SelectedPosition = "未选择";
             return;
         }
+
         SelectedBlockData = Sectors[SelectedSectorIndex].Blocks[SelectedBlockIndex].Data;
         SelectedPosition = $"扇区{SelectedSectorIndex}，块{SelectedBlockIndex}";
     }
+
     [RelayCommand]
     private void Read() => _ = M1ReadSector();
+
     private async Task M1ReadSector()
     {
         if (!CardHelper.isConnected)
@@ -73,7 +78,7 @@ public partial class M1ReadViewModel : ViewModelBase
             for (byte j = 0; j < 4; j++)
             {
                 string blockContent;
-                if (CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04) ,(byte)(4 * i + j), PassWorld))
+                if (CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04), (byte)(4 * i + j), PassWorld))
                 {
                     var raw = CardHelper.M1ReadSector((byte)(4 * i + j));
                     blockContent = raw.Length >= 32 ? raw.Substring(0, 32) : raw;
@@ -89,8 +94,10 @@ public partial class M1ReadViewModel : ViewModelBase
 
         RefreshSelectedDisplay();
     }
+
     [RelayCommand]
     public void Write() => _ = M1WriteSector();
+
     private async Task M1WriteSector()
     {
         if (SelectedBlockData.Length != 32)
@@ -98,7 +105,7 @@ public partial class M1ReadViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("警告", $"写入位数错误:{SelectedBlockData.Length}").ShowAsync();
             return;
         }
-        
+
         if (!CardHelper.isConnected)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
@@ -112,12 +119,14 @@ public partial class M1ReadViewModel : ViewModelBase
             return;
         }
 
-        if (!CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04), (byte)(SelectedSectorIndex * 4 + SelectedBlockIndex), PassWorld))
+        if (!CardHelper.AuthenticationPass((byte)(PwdType ? 0x00 : 0x04),
+                (byte)(SelectedSectorIndex * 4 + SelectedBlockIndex), PassWorld))
         {
             CVM.AddLog("密码验证错误");
             return;
         }
-        if(CardHelper.M1WriteSector(SelectedSectorIndex * 4 + SelectedBlockIndex, SelectedBlockData))
+
+        if (CardHelper.M1WriteSector(SelectedSectorIndex * 4 + SelectedBlockIndex, SelectedBlockData))
         {
             CVM.AddLog("M1修改成功");
             Read();
@@ -126,8 +135,5 @@ public partial class M1ReadViewModel : ViewModelBase
         {
             CVM.AddLog("M1修改失败");
         }
-
     }
-    
-    
 }

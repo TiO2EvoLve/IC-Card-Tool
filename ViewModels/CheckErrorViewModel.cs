@@ -5,16 +5,18 @@ using D8_Demo.Tool;
 
 namespace D8_Demo.ViewModels;
 
-public partial class CheckErrorViewModel
+public partial class CheckErrorViewModel : ViewModelBase
 {
-    private readonly CardHelper CardHelper = CardHelper.Instance;//卡片工具类
-    
-    //单例模式
-    public static CheckErrorViewModel Instance { get; } = new();
+    private readonly CardHelper CardHelper;
+
+    public CheckErrorViewModel(CardHelper cardHelper)
+    {
+        CardHelper = cardHelper;
+    }
+
     [RelayCommand]
     private void CheckError()
     {
-        
         if (!CardHelper.Reset() || CardHelper.FindCard() == 0)
         {
             Console.WriteLine("复位失败或未检测到卡片");
@@ -51,8 +53,5 @@ public partial class CheckErrorViewModel
         string st = CardHelper.APDU(strCommand);
 
         Console.WriteLine($"认证返回值：{st ?? "<null>"}");
-
-        
     }
-    
 }

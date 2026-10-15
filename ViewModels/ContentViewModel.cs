@@ -21,50 +21,73 @@ public partial class ContentViewModel : ViewModelBase
 {
     //端口号
     [ObservableProperty] private int port = 100;
+
     //波特率
     [ObservableProperty] private int hz = 115200;
+
     //端口开启状态指示
     [ObservableProperty] private IImmutableSolidColorBrush color = Brushes.Red;
+
     //找到卡片状态指示
-    [ObservableProperty] private IImmutableSolidColorBrush findCard =  Brushes.Red;
+    [ObservableProperty] private IImmutableSolidColorBrush findCard = Brushes.Red;
+
     //芯片基本信息
     [ObservableProperty] private string? uid16;
     [ObservableProperty] private string? uid16_;
     [ObservableProperty] private string? uid10;
     [ObservableProperty] private string? uid10_;
+
     [ObservableProperty] private string? ats;
+
     //设备名
     [ObservableProperty] private string? deviceName;
+
     [ObservableProperty] private string? firmwareVersion;
+
     //当前状态
     [ObservableProperty] private State? status = State.等待读取;
+
     //波特率选项列表
     public ObservableCollection<string> Options { get; set; } =
     [
         "1200", "2400", "4800", "9600", "14400", "19200", "28800", "38400", "57600", "115200", "128000", "230400",
         "256000", "460800", "921600"
     ];
+
     //选中的波特率
     [ObservableProperty] private string? selectedOption = "115200";
+
     //卡号
-    [ObservableProperty]private string sn = "1";
+    [ObservableProperty] private string sn = "1";
+
     [ObservableProperty] private bool isChecked = true;
+
     //卡片列表
     public ObservableCollection<Card> Cards { get; set; } = new();
-    //全局设置
-    private static AppSettings Settings  = AppSettings.Instance;
+
+    private readonly AppSettings Settings;
+
     //运行状态
     [ObservableProperty] private bool isRunning;
+
     //日志内容
-    [ObservableProperty] private TextDocument logDoc = new ();
+    [ObservableProperty] private TextDocument logDoc = new();
+
     //卡片帮助类
-    private readonly CardHelper CardHelper = CardHelper.Instance;
+    private readonly CardHelper CardHelper;
+    private readonly Mdb _mdb;
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
-    //TODO :发布时改为私有
-    public ContentViewModel() { }
-    public static ContentViewModel Instance { get; } = new ();
+
+    public ContentViewModel(CardHelper cardHelper, SettingsManage settingsManage, Mdb mdb)
+    {
+        CardHelper = cardHelper;
+        Settings = settingsManage.Settings;
+        _mdb = mdb;
+    }
+
     #region 打开端口
+
     [RelayCommand]
     public async Task OpenPort()
     {
@@ -74,7 +97,8 @@ public partial class ContentViewModel : ViewModelBase
             if (!CardHelper.OpenPort(Convert.ToInt16(Port), Convert.ToInt32(SelectedOption)))
             {
                 await ShowMessage("失败", "打开端口失败,请检查读卡器是否已连接");
-            }else
+            }
+            else
             {
                 Color = Brushes.LimeGreen;
                 CardHelper.Beep(Settings.Sound);
@@ -85,12 +109,15 @@ public partial class ContentViewModel : ViewModelBase
         {
             await ShowMessage("失败", "请根据你的系统更换对应的dcrf32.dll，请检查");
         }
+
         DeviceName = CardHelper.GetDeviceName();
         FirmwareVersion = CardHelper.GetDeviceVersion();
-
     }
+
     #endregion
+
     #region 关闭端口
+
     [RelayCommand]
     public async Task ClosePort()
     {
@@ -104,8 +131,11 @@ public partial class ContentViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("失败", "关闭端口失败").ShowAsync();
         }
     }
-    #endregion 
+
+    #endregion
+
     #region 读卡
+
     [RelayCommand]
     private async Task ReadCard()
     {
@@ -147,7 +177,7 @@ public partial class ContentViewModel : ViewModelBase
 
     private async Task RunLoopAsync(CancellationToken token)
     {
-        ulong uid = 0;//记录上次读的卡片
+        ulong uid = 0; //记录上次读的卡片
         try
         {
             while (!token.IsCancellationRequested)
@@ -155,21 +185,25 @@ public partial class ContentViewModel : ViewModelBase
                 if (!CardHelper.isConnected) break; // 如果端口关闭，跳出循环
                 if (!CardHelper.Reset())
                 {
-                    await Dispatcher.UIThread.InvokeAsync(() => {
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         Status = State.复位异常;
                         AddLog("复位异常");
                     });
                     return;
                 }
+
                 ulong CardUid = CardHelper.FindCard();
                 if (CardUid != 0) // 0 表示失败
                 {
-                    await Dispatcher.UIThread.InvokeAsync(() => {
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         FindCard = Brushes.LimeGreen;
                         Status = State.读卡中;
                     });
-                    
-                    await Dispatcher.UIThread.InvokeAsync(() => {
+
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         Uid16_ = CardUid.ToString("X").PadLeft(8, '0');
                         Uid16 = Tools.ChangeHexPairs(Uid16_).PadLeft(8, '0');
                         Uid10 = Convert.ToUInt32(Uid16, 16).ToString();
@@ -183,11 +217,13 @@ public partial class ContentViewModel : ViewModelBase
                     await Task.Delay(Settings.SleepTime, token);
                     continue;
                 }
+
                 //取ATS
                 Ats = CardHelper.ResetHex();
                 if (string.IsNullOrEmpty(Ats))
                 {
-                    await Dispatcher.UIThread.InvokeAsync(() => {
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         Status = State.非CPU卡;
                         Ats = "非CPU卡";
                     });
@@ -199,8 +235,9 @@ public partial class ContentViewModel : ViewModelBase
                     await Dispatcher.UIThread.InvokeAsync(() => Status = State.同一张卡);
                     await Task.Delay(500, token);
                 }
+
                 uid = CardUid;
-                
+
                 //判断是否已经有该数据并添加
                 if (Cards != null && Cards.All(card => card.UID10_ != Uid10_))
                 {
@@ -230,22 +267,26 @@ public partial class ContentViewModel : ViewModelBase
                                 UID16_ = Uid16_,
                                 ATS = Ats,
                                 Time = DateTime.Now
-                            }); 
+                            });
                         }
                     });
                 }
+
                 CardHelper.Beep(Settings.Sound);
                 await Task.Delay(Settings.SleepTime, token);
             }
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception ex)
         {
             await Dispatcher.UIThread.InvokeAsync(() => AddLog("读取错误：" + ex.Message));
         }
         finally
         {
-            await Dispatcher.UIThread.InvokeAsync(() => {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
                 FindCard = Brushes.Red;
                 Status = State.等待读取;
                 IsRunning = false;
@@ -255,15 +296,21 @@ public partial class ContentViewModel : ViewModelBase
             _runningTask = null;
         }
     }
+
     #endregion
+
     #region 清除列表
+
     [RelayCommand]
     private void ClearCards()
     {
         Cards.Clear();
     }
+
     #endregion
+
     #region 保存数据
+
     [RelayCommand]
     private async Task SaveData()
     {
@@ -272,6 +319,7 @@ public partial class ContentViewModel : ViewModelBase
             await ShowMessage("失败", "没有数据需要保存");
             return;
         }
+
         var sourceFilePath = "temple/卡片信息.mdb";
         var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         var destinationFilePath = Path.Combine(desktopPath, "卡片信息.mdb");
@@ -284,16 +332,19 @@ public partial class ContentViewModel : ViewModelBase
             await ShowMessage("失败", $"保存失败：{ex.Message}");
             return;
         }
+
         //保存数据到数据库
-        var sqls = new List<string> {
+        var sqls = new List<string>
+        {
             // 先清空表
-            "DELETE FROM kahao" };
+            "DELETE FROM kahao"
+        };
         sqls.AddRange(Cards.Select(card => $@"
         INSERT INTO kahao (SN, ATS, UID16, UID16_, UID10, UID10_, [Time]) 
         VALUES ('{card.SN}', '{card.ATS}', '{card.UID16}', '{card.UID16_}', '{card.UID10}', '{card.UID10_}', #{card.Time:yyyy-MM-dd HH:mm:ss}#)"));
         try
         {
-            await Task.Run(() => Mdb.ExecuteBatch(destinationFilePath, sqls));
+            await Task.Run(() => _mdb.ExecuteBatch(destinationFilePath, sqls));
             await ShowMessage("成功", "数据已保存到桌面");
         }
         catch (Exception ex)
@@ -301,7 +352,9 @@ public partial class ContentViewModel : ViewModelBase
             await ShowMessage("失败", $"保存失败：{ex.Message}");
         }
     }
+
     #endregion
+
     // 清除显示数据
     void Clear()
     {
@@ -313,12 +366,14 @@ public partial class ContentViewModel : ViewModelBase
         Ats = "";
         Status = State.等待放卡;
     }
+
     // 清除日志
     [RelayCommand]
     void ClearLogs()
     {
         LogDoc.Text = string.Empty;
     }
+
     // 添加日志
     public void AddLog(string msg)
     {
@@ -329,10 +384,10 @@ public partial class ContentViewModel : ViewModelBase
                 $"{msg}{Environment.NewLine}");
         });
     }
+
     // 显示消息框
     async Task ShowMessage(string title, string message)
     {
         await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
     }
 }
-   

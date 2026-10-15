@@ -7,10 +7,6 @@
              xmlns:converter="clr-namespace:D8_Demo.Converter"
              x:DataType="vm:M1ReadViewModel"
              x:Class="D8_Demo.Views.UserControl.M1ReadView">
-    <Design.DataContext>
-        <vm:M1ReadViewModel />
-    </Design.DataContext>
-
     <UserControl.Resources>
         <converter:BoolToRadioConverter x:Key="BoolToRadioConverter"/>
     </UserControl.Resources>

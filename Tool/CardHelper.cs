@@ -8,16 +8,21 @@ namespace D8_Demo.Tool;
 
 public class CardHelper
 {
-    [DllImport("dcrf32.dll")] private static extern int dc_init(short port, int baud);//打开端口
-    [DllImport("dcrf32.dll")] private static extern int dc_exit(int icdev);//关闭端口
     [DllImport("dcrf32.dll")]
-    public static extern short dc_pro_commandlinkInt_hex(int idComDev, uint slen, ref byte sendbuffer, ref uint rlen, ref byte databuffer, char timeout); //发指令
+    private static extern int dc_init(short port, int baud); //打开端口
+
+    [DllImport("dcrf32.dll")]
+    private static extern int dc_exit(int icdev); //关闭端口
+
+    [DllImport("dcrf32.dll")]
+    public static extern short dc_pro_commandlinkInt_hex(int idComDev, uint slen, ref byte sendbuffer, ref uint rlen,
+        ref byte databuffer, char timeout); //发指令
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_reset(int icdev, uint sec); //复位
 
     [DllImport("dcrf32.dll")]
-    private static extern short dc_card(int icdev, char _Mode, ref ulong Snr);//寻卡
+    private static extern short dc_card(int icdev, char _Mode, ref ulong Snr); //寻卡
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_pro_resethex(int icdev, ref byte rlen, ref byte rbuff); //复位
@@ -30,47 +35,76 @@ public class CardHelper
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_anticoll(int icdev, uint Mode, ref ulong Snr); //获取芯片号
-    [DllImport("dcrf32.dll")]
-    private static extern int dc_load_key(int icdev, int mode, int secnr, [In] byte[] nkey);  //密码装载到读写模块中
-    [DllImport("dcrf32.dll")]
-    private static extern short dc_authentication_passaddr(int icdev, byte _Mode,byte _Addr, [In]byte[] passbuff);//M1密码验证
-    [DllImport("dcrf32.dll")]private static extern short dc_authentication_pass(int icdev, byte _Mode,byte _Addr, [In]byte[] passbuff);//M1密码验证
-    [DllImport("dcrf32.dll")]
-    private static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata);  //M1读扇区
-    [DllImport("dcrf32.dll")]
-    private static extern int dc_write(int icdev, int _Adr, byte[] _Data);//M1写扇区
-    [DllImport("dcrf32.dll")] private static extern short dc_getname(int icdev, StringBuilder name);//获取设备名
-    [DllImport("dcrf32.dll")] private static extern short dc_getver(int icdev, StringBuilder sver);//获取设备名
-    [DllImport("dcrf32.dll")] private static extern short dc_beep(int icdev, uint _Msec);//蜂鸣
 
     [DllImport("dcrf32.dll")]
-    private static extern int dc_setcpu(int icdev,byte _Byte);//设置PSAM卡座
+    private static extern int dc_load_key(int icdev, int mode, int secnr, [In] byte[] nkey); //密码装载到读写模块中
+
     [DllImport("dcrf32.dll")]
-    public static extern short dc_cpureset(int icdev, ref byte rlen, [Out]byte[] databuffer);//接触式卡复位
-    [DllImport("dcrf32.dll")]private static extern int dc_cpuapduInt_hex(int icdev,int slen, string sendbuffer, ref int rlen, ref byte databuffer);//接触式卡指令交互
+    private static extern short
+        dc_authentication_passaddr(int icdev, byte _Mode, byte _Addr, [In] byte[] passbuff); //M1密码验证
+
     [DllImport("dcrf32.dll")]
-    public static extern short dc_cpuapduInt(int icdev, int slen, [In]byte[] sendbuffer, ref uint rlen, [Out]byte[] databuffer); 
+    private static extern short
+        dc_authentication_pass(int icdev, byte _Mode, byte _Addr, [In] byte[] passbuff); //M1密码验证
+
+    [DllImport("dcrf32.dll")]
+    private static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata); //M1读扇区
+
+    [DllImport("dcrf32.dll")]
+    private static extern int dc_write(int icdev, int _Adr, byte[] _Data); //M1写扇区
+
+    [DllImport("dcrf32.dll")]
+    private static extern short dc_getname(int icdev, StringBuilder name); //获取设备名
+
+    [DllImport("dcrf32.dll")]
+    private static extern short dc_getver(int icdev, StringBuilder sver); //获取设备名
+
+    [DllImport("dcrf32.dll")]
+    private static extern short dc_beep(int icdev, uint _Msec); //蜂鸣
+
+    [DllImport("dcrf32.dll")]
+    private static extern int dc_setcpu(int icdev, byte _Byte); //设置PSAM卡座
+
+    [DllImport("dcrf32.dll")]
+    public static extern short dc_cpureset(int icdev, ref byte rlen, [Out] byte[] databuffer); //接触式卡复位
+
+    [DllImport("dcrf32.dll")]
+    private static extern int dc_cpuapduInt_hex(int icdev, int slen, string sendbuffer, ref int rlen,
+        ref byte databuffer); //接触式卡指令交互
+
+    [DllImport("dcrf32.dll")]
+    public static extern short dc_cpuapduInt(int icdev, int slen, [In] byte[] sendbuffer, ref uint rlen,
+        [Out] byte[] databuffer);
+
     //设备号
     private int icdev;
-    //是否已连接
-    public bool isConnected ;
-    //单例模式
-    public static CardHelper Instance { get; } = new();
 
-    private CardHelper()
+    //是否已连接
+    public bool isConnected;
+
+    public CardHelper()
     {
-        
     }
-    //打开端口
+
+    /// <summary>
+    /// 打开端口
+    /// </summary>
+    /// <param name="port">端口号</param>
+    /// <param name="hz">波特率</param>
+    /// <returns></returns>
     public bool OpenPort(int port, int hz)
     {
         int st = dc_init(Convert.ToInt16(port), hz);
-        if(st < 0) return false;
+        if (st < 0) return false;
         icdev = st;
         isConnected = true;
         return true;
     }
-    //关闭端口
+
+    /// <summary>
+    /// 关闭端口
+    /// </summary>
+    /// <returns></returns>
     public bool ClosePort()
     {
         if (dc_exit(icdev) == 0)
@@ -78,14 +112,24 @@ public class CardHelper
             isConnected = false;
             return true;
         }
+
         return false;
     }
-    //蜂鸣
+
+    /// <summary>
+    /// 蜂鸣
+    /// </summary>
+    /// <param name="canBeep">是否蜂鸣</param>
     public void Beep(bool canBeep)
     {
-        if(canBeep) dc_beep(icdev, 10);//蜂鸣
+        if (canBeep) dc_beep(icdev, 10); //蜂鸣
     }
-    //向CPU卡发指令
+
+    /// <summary>
+    /// 向CPU卡发指令
+    /// </summary>
+    /// <param name="sendbuffer">要发送的指令</param>
+    /// <returns></returns>
     public string APDU(string sendbuffer)
     {
         byte[] sbuff = Encoding.ASCII.GetBytes(sendbuffer);
@@ -106,8 +150,12 @@ public class CardHelper
 
         return strrbuff;
     }
-   
-    //向接触式卡发指令
+
+    /// <summary>
+    /// 向接触式卡发指令
+    /// </summary>
+    /// <param name="hexString">要发送的指令</param>
+    /// <returns></returns>
     public string PSAMAPDU(string hexString)
     {
         uint rlen = 0;
@@ -117,6 +165,7 @@ public class CardHelper
         {
             sendbuffer[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
         }
+
         int st = dc_cpuapduInt(icdev, sendbuffer.Length, sendbuffer, ref rlen, databuffer);
         if (st != 0)
         {
@@ -124,31 +173,46 @@ public class CardHelper
         }
         else
         {
-            Console.WriteLine("指令发送成功");     
+            Console.WriteLine("指令发送成功");
         }
 
         Console.WriteLine($"返回长度：{rlen}");
-        return BitConverter.ToString(databuffer).Replace("-","");
+        return BitConverter.ToString(databuffer).Replace("-", "");
     }
-    //设置卡座
+
+    /// <summary>
+    /// 设置卡座
+    /// </summary>
+    /// <returns></returns>
     public bool Setcpu()
     {
-        if (dc_setcpu(icdev,0x0C) != 0)
+        if (dc_setcpu(icdev, 0x0C) != 0)
         {
             return false;
         }
+
         return true;
     }
-    //复位
+
+    /// <summary>
+    /// 复位
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
     public bool Reset(uint time = 10)
     {
         if (dc_reset(icdev, time) != 0)
         {
             return false;
         }
+
         return true;
     }
-    //PSAM卡复位
+
+    /// <summary>
+    /// PSAM卡复位
+    /// </summary>
+    /// <returns></returns>
     public bool PSAMReset()
     {
         byte rcardlen = 0;
@@ -158,11 +222,15 @@ public class CardHelper
         {
             return false;
         }
+
         return true;
     }
-    
 
-    //复位
+
+    /// <summary>
+    /// 复位
+    /// </summary>
+    /// <returns></returns>
     public string ResetHex()
     {
         byte crlen = 1;
@@ -181,7 +249,10 @@ public class CardHelper
         return num.Replace("\0", "");
     }
 
-    //寻卡
+    /// <summary>
+    /// 寻卡
+    /// </summary>
+    /// <returns></returns>
     public ulong FindCard()
     {
         ulong CardUid = 0;
@@ -189,11 +260,14 @@ public class CardHelper
         {
             return CardUid;
         }
-        return 0;
 
+        return 0;
     }
 
-    //获取特征值
+    /// <summary>
+    /// 获取特征值
+    /// </summary>
+    /// <returns></returns>
     public string Request()
     {
         ushort TagType = 0;
@@ -203,7 +277,11 @@ public class CardHelper
         return TagType.ToString();
     }
 
-    //选卡
+    /// <summary>
+    /// 选卡
+    /// </summary>
+    /// <param name="uid"></param>
+    /// <returns></returns>
     public string Select(string uid)
     {
         Int32 i = Int32.Parse(uid, System.Globalization.NumberStyles.HexNumber);
@@ -224,7 +302,10 @@ public class CardHelper
         return (data_r);
     }
 
-    //获取芯片号
+    /// <summary>
+    /// 获取芯片号
+    /// </summary>
+    /// <returns></returns>
     public string Anticoll()
     {
         ulong Snr = 0;
@@ -233,9 +314,17 @@ public class CardHelper
         {
             return "";
         }
+
         return Snr.ToString("X").PadLeft(8, '0');
     }
-    //加载密码
+
+    /// <summary>
+    /// 加载密码
+    /// </summary>
+    /// <param name="secnr"></param>
+    /// <param name="strKey"></param>
+    /// <param name="KeyStyle"></param>
+    /// <returns></returns>
     public bool LodeKey(int secnr, string strKey, int KeyStyle)
     {
         byte[] hexkey = new byte[6];
@@ -243,18 +332,32 @@ public class CardHelper
         {
             return false;
         }
+
         return true;
     }
-    //M1密码验证
+
+    /// <summary>
+    /// M1密码验证
+    /// </summary>
+    /// <param name="_Mode">模式</param>
+    /// <param name="_Addr">地址</param>
+    /// <param name="passbuff">密码</param>
+    /// <returns></returns>
     public bool AuthenticationPass(byte _Mode, byte _Addr, string passbuff)
     {
         if (dc_authentication_passaddr(icdev, _Mode, _Addr, Tools.HexStringToBytes(passbuff)) == 0)
         {
             return true;
         }
+
         return false;
     }
-    //M1读扇区
+
+    /// <summary>
+    /// M1读扇区
+    /// </summary>
+    /// <param name="address">地址</param>
+    /// <returns></returns>
     public string M1ReadSector(byte address)
     {
         byte[] sdata = new byte[33];
@@ -263,29 +366,45 @@ public class CardHelper
         {
             return "";
         }
+
         // 将 byte[] 转为十六进制字符串返回
         StringBuilder sb = new StringBuilder();
         foreach (byte b in sdata)
         {
             sb.Append(b.ToString("X2"));
         }
+
         return sb.ToString();
     }
-    //M1写扇区
+
+    /// <summary>
+    /// M1写扇区
+    /// </summary>
+    /// <param name="address">地址</param>
+    /// <param name="data">数据</param>
+    /// <returns></returns>
     public bool M1WriteSector(int address, string data)
     {
         address = Convert.ToInt16(address);
-        if(dc_write(icdev, address, Tools.HexStringToBytes(data)) == 0)
+        if (dc_write(icdev, address, Tools.HexStringToBytes(data)) == 0)
         {
             return true;
         }
+
         return false;
     }
-    //加载密钥
-    public bool LoadKey(int secnr,string strKey,int KeyStyle)
+
+    /// <summary>
+    /// 加载密钥
+    /// </summary>
+    /// <param name="secnr"></param>
+    /// <param name="strKey"></param>
+    /// <param name="KeyStyle"></param>
+    /// <returns></returns>
+    public bool LoadKey(int secnr, string strKey, int KeyStyle)
     {
         byte[] hexkey = new byte[6];
-        hexkey= Enumerable.Range(0, strKey.Length / 2)
+        hexkey = Enumerable.Range(0, strKey.Length / 2)
             .Select(i => Convert.ToByte(strKey.Substring(i * 2, 2), 16))
             .ToArray();
         int st = dc_load_key(icdev, KeyStyle, secnr, hexkey);
@@ -296,7 +415,11 @@ public class CardHelper
 
         return true;
     }
-    //获取设备名
+
+    /// <summary>
+    /// 获取设备名
+    /// </summary>
+    /// <returns></returns>
     public string GetDeviceName()
     {
         StringBuilder name = new StringBuilder(64); // 分配64字节缓冲区
@@ -306,10 +429,12 @@ public class CardHelper
         }
 
         return "";
-        
-       
     }
-    //获取版本号
+
+    /// <summary>
+    /// 获取版本号
+    /// </summary>
+    /// <returns></returns>
     public string GetDeviceVersion()
     {
         StringBuilder ver = new StringBuilder(128); // 分配128字节缓冲

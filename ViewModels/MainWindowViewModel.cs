@@ -5,16 +5,34 @@ namespace D8_Demo.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public MenuViewModel MenuVm { get; } = new();
-    public ContentViewModel ContentVm { get; } = ContentViewModel.Instance;
-    public SettingsViewModel SettingsVm { get; }= SettingsViewModel.Instance;
-    public CardCheckViewModel CardCheckVm { get; } = CardCheckViewModel.Instance;
-    public M1ReadViewModel M1ReadVm { get; } = M1ReadViewModel.Instance;
-    public PSAMReaderViewModel PSAMVm { get; } = PSAMReaderViewModel.Instance;
-    public CheckErrorViewModel CheckErrorVm { get; } = CheckErrorViewModel.Instance;
+    public MenuViewModel MenuVm { get; }
+    public ContentViewModel ContentVm { get; }
+    public SettingsViewModel SettingsVm { get; }
+    public CardCheckViewModel CardCheckVm { get; }
+    public M1ReadViewModel M1ReadVm { get; }
+    public PSAMReaderViewModel PSAMVm { get; }
+    public CheckErrorViewModel CheckErrorVm { get; }
 
+    public MainWindowViewModel(
+        MenuViewModel menuVm,
+        ContentViewModel contentVm,
+        SettingsViewModel settingsVm,
+        CardCheckViewModel cardCheckVm,
+        M1ReadViewModel m1ReadVm,
+        PSAMReaderViewModel psamVm,
+        CheckErrorViewModel checkErrorVm)
+    {
+        MenuVm = menuVm;
+        ContentVm = contentVm;
+        SettingsVm = settingsVm;
+        CardCheckVm = cardCheckVm;
+        M1ReadVm = m1ReadVm;
+        PSAMVm = psamVm;
+        CheckErrorVm = checkErrorVm;
+    }
 
     private int _selectedTabIndex;
+
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;
@@ -23,7 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (_selectedTabIndex != value)
             {
                 _selectedTabIndex = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
                 _ = UpdateRunningStateAsync();
             }
         }
@@ -36,11 +54,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             ContentVm.StopAsync(),
             CardCheckVm.StopAsync(),
-            
         };
         // 等待短超时内停止完成，不阻塞 UI 过久
         await Task.WhenAny(Task.WhenAll(stopTasks), Task.Delay(1500));
-
-       
     }
 }

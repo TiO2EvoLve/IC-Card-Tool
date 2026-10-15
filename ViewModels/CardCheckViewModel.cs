@@ -17,19 +17,19 @@ namespace D8_Demo.ViewModels;
 
 public partial class CardCheckViewModel : ViewModelBase
 {
-    [ObservableProperty] private IImmutableSolidColorBrush findCard =  Brushes.Red;
-    [ObservableProperty] private string? returnValue;//返回值
+    [ObservableProperty] private IImmutableSolidColorBrush findCard = Brushes.Red;
+    [ObservableProperty] private string? returnValue; //返回值
     [ObservableProperty] private string? cardType = "未检测到卡片";
-    [ObservableProperty] private string? aTS = "";//ATS
-    [ObservableProperty] private string? aTQA = "";//ATQA
-    [ObservableProperty] private string? sAK = "";//SAK
-    [ObservableProperty]private int lastDuration;//上次耗时
-    [ObservableProperty]private int count;//计数
-    
-    private readonly CardHelper CardHelper = CardHelper.Instance;//卡片工具类
-    private readonly ContentViewModel CVM = ContentViewModel.Instance;
-    private static AppSettings Settings { get; set; }  = AppSettings.Instance;//全局设置
-    
+    [ObservableProperty] private string? aTS = ""; //ATS
+    [ObservableProperty] private string? aTQA = ""; //ATQA
+    [ObservableProperty] private string? sAK = ""; //SAK
+    [ObservableProperty] private int lastDuration; //上次耗时
+    [ObservableProperty] private int count; //计数
+
+    private readonly CardHelper CardHelper;
+    private readonly ContentViewModel CVM;
+    private readonly AppSettings Settings;
+
     private static readonly IReadOnlyDictionary<string, string> ChipType =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -53,9 +53,10 @@ public partial class CardCheckViewModel : ViewModelBase
         new CardTable { Name = "UL", Atqa = "44", Sak = "00" },
         new CardTable { Name = "CPU", Atqa = "8", Sak = "20" },
     };
+
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
-    
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsCpu))]
     [NotifyPropertyChangedFor(nameof(IsM1))]
@@ -63,15 +64,18 @@ public partial class CardCheckViewModel : ViewModelBase
     private CardCheckType cardCheckType = CardCheckType.Unknown;
 
     public bool IsCpu => CardCheckType == CardCheckType.Cpu;
-    public bool IsM1  => CardCheckType == CardCheckType.M1;
-    public bool IsUl  => CardCheckType == CardCheckType.Ul;
-    
-    //TODO :发布时改为私有
-    public CardCheckViewModel()
+    public bool IsM1 => CardCheckType == CardCheckType.M1;
+    public bool IsUl => CardCheckType == CardCheckType.Ul;
+
+    public CardCheckViewModel(
+        CardHelper cardHelper,
+        ContentViewModel contentViewModel,
+        SettingsManage settingsManage)
     {
+        CardHelper = cardHelper;
+        CVM = contentViewModel;
+        Settings = settingsManage.Settings;
     }
-    //单例模式
-    public static CardCheckViewModel Instance { get; } = new();
 
     private Task StartAsync()
     {
@@ -97,10 +101,12 @@ public partial class CardCheckViewModel : ViewModelBase
         finally
         {
             FindCard = Brushes.Red;
-            Count = 0;//计数归0
+            Count = 0; //计数归0
             CardType = "已停止检测";
         }
-;        _cts.Dispose();
+
+        ;
+        _cts.Dispose();
         _cts = null;
     }
 
@@ -112,13 +118,14 @@ public partial class CardCheckViewModel : ViewModelBase
             _ = ShowMessage("警告", "请先打开端口");
             return;
         }
+
         _ = StartAsync();
     }
+
     [RelayCommand]
     private void StopChipType()
     {
         _ = StopAsync();
-        
     }
 
     private async Task Check(CancellationToken token)
@@ -136,17 +143,18 @@ public partial class CardCheckViewModel : ViewModelBase
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
+
             //获取ATQA
             ATQA = CardHelper.Request();
             //获取SAK
-            var uid =  CardHelper.Anticoll();
-            if(uid != "") SAK = CardHelper.Select(uid);
+            var uid = CardHelper.Anticoll();
+            if (uid != "") SAK = CardHelper.Select(uid);
             CardCheckType = SAK switch
             {
                 "08" or "18" => CardCheckType.M1,
-                "00"         => CardCheckType.Ul,
-                "20"         => CardCheckType.Cpu,
-                 _            => CardCheckType.Unknown,
+                "00" => CardCheckType.Ul,
+                "20" => CardCheckType.Cpu,
+                _ => CardCheckType.Unknown,
             };
             //复位ATS
             var ats = CardHelper.ResetHex();
@@ -161,6 +169,7 @@ public partial class CardCheckViewModel : ViewModelBase
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
+
             ATS = ats;
             //选择主目录
             _ = CardHelper.APDU("00A404000C54656D706F726172792E4D46");
@@ -170,16 +179,19 @@ public partial class CardCheckViewModel : ViewModelBase
                 ReturnValue = "空";
                 continue;
             }
+
             if (response.EndsWith("9000"))
             {
                 ReturnValue = response;
                 //芯片为1280
                 FM1280(response);
-            }else
+            }
+            else
             {
                 //芯片为1208
-                FM1208(ATQA,ATS);
+                FM1208(ATQA, ATS);
             }
+
             FindCard = Brushes.Red;
             CardHelper.Beep(Settings.Sound);
             Count++;
@@ -188,7 +200,6 @@ public partial class CardCheckViewModel : ViewModelBase
             LastDuration = (int)stopwatch.ElapsedMilliseconds;
             await Task.Delay(Settings.SleepTime, token);
         }
-
     }
 
     private void FM1280(string response)
@@ -202,6 +213,7 @@ public partial class CardCheckViewModel : ViewModelBase
                 break;
             }
         }
+
         // 确保在 UI 线程更新属性
         _ = Dispatcher.UIThread.InvokeAsync(() => CardType = result);
     }
@@ -213,11 +225,13 @@ public partial class CardCheckViewModel : ViewModelBase
             _ = Dispatcher.UIThread.InvokeAsync(() => CardType = "无法解析 ATS");
             return;
         }
+
         var core = ats.Substring(ats.Length - 16, 8); // safe now
         var isZero = core == "00000000";
         _ = atqa switch
         {
-            "8" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
+            "8" => Dispatcher.UIThread.InvokeAsync(() =>
+                CardType = isZero ? "FM1208-09或FM1216-109" : "FM1208-59或FM1208-73或FM1216-143"),
             "4" => Dispatcher.UIThread.InvokeAsync(() => CardType = isZero ? "FM1208-10或FM1216-110" : "FM1208-76"),
             _ => Dispatcher.UIThread.InvokeAsync(() => CardType = "未知 FM1208 特征")
         };
@@ -236,6 +250,7 @@ public partial class CardCheckViewModel : ViewModelBase
         ReturnValue = "该芯片类型无返回值";
         ATS = "该芯片类型无ATS";
     }
+
     void Clear()
     {
         ReturnValue = "";
@@ -254,10 +269,10 @@ public partial class CardCheckViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard(title, message).ShowAsync();
         });
     }
+
     // 添加日志
     void AddLog(string msg)
     {
         CVM.AddLog(msg);
     }
-    
 }

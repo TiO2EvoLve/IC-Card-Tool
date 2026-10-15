@@ -3,49 +3,59 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using D8_Demo.Service;
+using D8_Demo.Tool;
 using D8_Demo.ViewModels;
 using D8_Demo.Views;
+using D8_Demo.Views.UserControl;
 using DryIoc;
-using Microsoft.Extensions.Configuration;
-
 
 namespace D8_Demo;
 
 public partial class App : Application
 {
-    public static IConfigurationRoot Configuration { get; private set; }
-
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-        
-        Configuration = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory) // 设置基目录
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .Build();
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // 1. 创建容器
         var container = new Container();
-        
-        // 注册错误信息服务为单例
+
+        container.Register<SettingsManage>(Reuse.Singleton);
+        container.Register<CardHelper>(Reuse.Singleton);
+        container.Register<Mdb>(Reuse.Singleton);
         container.Register<CardErrorService>(Reuse.Singleton);
 
-        // 注册 ViewModel
-        container.Register<MainWindowViewModel>();
-        // 应用启动时提前加载 TOML
+        container.Register<MainWindowViewModel>(Reuse.Singleton);
+        container.Register<MenuViewModel>(Reuse.Singleton);
+        container.Register<ContentViewModel>(Reuse.Singleton);
+        container.Register<SettingsViewModel>(Reuse.Singleton);
+        container.Register<CardCheckViewModel>(Reuse.Singleton);
+        container.Register<M1ReadViewModel>(Reuse.Singleton);
+        container.Register<PSAMReaderViewModel>(Reuse.Singleton);
+        container.Register<CheckErrorViewModel>(Reuse.Singleton);
+
+        container.Register<MainWindow>();
+        container.Register<ReadView>();
+        container.Register<CardCheckView>();
+        container.Register<M1ReadView>();
+        container.Register<CheckErrorView>();
+        container.Register<PSAMReader>();
+        container.Register<SettingView>();
+
+        DataTemplates.Add(new ViewLocator(container));
         container.Resolve<CardErrorService>();
-        
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = container.Resolve<MainWindowViewModel>(),
-            };
+            var mainWindow = container.Resolve<MainWindow>();
+            mainWindow.DataContext = container.Resolve<MainWindowViewModel>();
+            mainWindow.ApplyMicaSetting(container.Resolve<SettingsManage>().Settings.EnableMica);
+            desktop.MainWindow = mainWindow;
+            desktop.Exit += (_, _) => container.Dispose();
         }
+
         base.OnFrameworkInitializationCompleted();
     }
-    
 }
