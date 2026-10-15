@@ -6,11 +6,8 @@
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:CardCheckViewModel"
              x:Class="D8_Demo.Views.UserControl.CardCheckView">
-    <Design.DataContext>
-        <vm:CardCheckViewModel />
-    </Design.DataContext>
-
-    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto" RowSpacing="20">
+    
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="20">
         <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="10">
@@ -40,7 +37,7 @@
         
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10">
             <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
-                <StackPanel Grid.Row="0" HorizontalAlignment="Left" Spacing="10">
+                <StackPanel HorizontalAlignment="Left" Spacing="10">
                     <TextBlock Text="芯片对照表" FontSize="18" FontWeight="SemiBold"></TextBlock>
                     <DataGrid ItemsSource="{Binding Tables}"
                               AutoGenerateColumns="False"
@@ -90,7 +87,8 @@
                 </Grid>
             </Border>
         </Grid>
-        <StackPanel Grid.Row="2" Margin="0,20,0,0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <Border Grid.Row="2" BorderThickness="1" BorderBrush="Lavender" CornerRadius="10">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="20">
             <TextBlock Text="判定结果:" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" ></TextBlock>
             <StackPanel.Styles>
                 <!-- 默认（未选中）状态 -->
@@ -145,6 +143,31 @@
                 <TextBlock Text="UL卡" />
             </Border>
         </StackPanel>
+        </Border>
+        
+        <Border Grid.Row="3" BorderThickness="1" BorderBrush="Lavender" CornerRadius="10">
+            <StackPanel Margin="20" Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="外部认证：" VerticalAlignment="Center"></TextBlock>
+                <ToggleSwitch IsChecked="{Binding IsAuth}"></ToggleSwitch>
+                <StackPanel.Styles>
+                    <Style Selector="Ellipse.auth-true">
+                        <Setter Property="Fill" Value="Green" />
+                    </Style>
+
+                    <Style Selector="Ellipse.auth-false">
+                        <Setter Property="Fill" Value="Red" />
+                    </Style>
+                </StackPanel.Styles>
+
+                <Ellipse Width="24"
+                         Height="24"
+                         VerticalAlignment="Center"
+                         Classes.auth-true="{Binding AuthCheck}"
+                         Classes.auth-false="{Binding !AuthCheck}" />
+                <TextBlock Text="{Binding CanTry,StringFormat='次数：{0:C}'}" IsVisible="{Binding CanTry,Converter={x:Static StringConverters.IsNotNullOrEmpty}}" VerticalAlignment="Center" MinWidth="20"></TextBlock>
+                <TextBlock Text="{Binding Respon,StringFormat='返回：{0:C}'}" IsVisible="{Binding Respon,Converter={x:Static StringConverters.IsNotNullOrEmpty}}" VerticalAlignment="Center" MinWidth="20"></TextBlock>
+            </StackPanel>
+        </Border>
     </Grid>
 
 </UserControl>
