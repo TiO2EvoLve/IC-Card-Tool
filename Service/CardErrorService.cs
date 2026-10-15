@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Tomlyn;
 
 namespace D8_Demo.Service;
@@ -13,13 +14,27 @@ public class CardErrorService
     {
         var path = Path.Combine(AppContext.BaseDirectory, "Config/error.toml");
 
-        var toml = File.ReadAllText(path);
+        if (!Path.Exists(path))
+            throw new FileNotFoundException($"未找到错误码配置文件：{path}");
 
-        var data = TomlSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(toml);
+        var toml = File.ReadAllText(path, Encoding.UTF8);
 
-        _errors = data != null && data.TryGetValue("errors", out var errors)
-            ? errors
-            : new Dictionary<string, string>();
+        var data = TomlSerializer.Deserialize<
+            Dictionary<string, Dictionary<string, string>>>(toml);
+
+        _errors = new Dictionary<string, string>(
+            StringComparer.OrdinalIgnoreCase);
+
+        if (data == null)
+            throw new InvalidOperationException("TOML 文件解析失败");
+
+        foreach (var item in data)
+        {
+            if (item.Value.TryGetValue("desc", out var desc))
+            {
+                _errors[item.Key] = desc;
+            }
+        }
     }
 
     public string GetMessage(string errorCode)

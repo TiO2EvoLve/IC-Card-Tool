@@ -21,7 +21,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var container = new Container();
-
+        
         container.Register<SettingsManage>(Reuse.Singleton);
         container.Register<CardHelper>(Reuse.Singleton);
         container.Register<Mdb>(Reuse.Singleton);
@@ -34,17 +34,16 @@ public partial class App : Application
         container.Register<CardCheckViewModel>(Reuse.Singleton);
         container.Register<M1ReadViewModel>(Reuse.Singleton);
         container.Register<PSAMReaderViewModel>(Reuse.Singleton);
-        container.Register<CheckErrorViewModel>(Reuse.Singleton);
 
         container.Register<MainWindow>();
         container.Register<ReadView>();
         container.Register<CardCheckView>();
         container.Register<M1ReadView>();
-        container.Register<CheckErrorView>();
         container.Register<PSAMReader>();
         container.Register<SettingView>();
 
         DataTemplates.Add(new ViewLocator(container));
+        
         container.Resolve<CardErrorService>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

@@ -3,33 +3,21 @@ using System.Threading.Tasks;
 
 namespace D8_Demo.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel(
+    MenuViewModel menuVm,
+    ContentViewModel contentVm,
+    SettingsViewModel settingsVm,
+    CardCheckViewModel cardCheckVm,
+    M1ReadViewModel m1ReadVm,
+    PSAMReaderViewModel psamVm)
+    : ViewModelBase
 {
-    public MenuViewModel MenuVm { get; }
-    public ContentViewModel ContentVm { get; }
-    public SettingsViewModel SettingsVm { get; }
-    public CardCheckViewModel CardCheckVm { get; }
-    public M1ReadViewModel M1ReadVm { get; }
-    public PSAMReaderViewModel PSAMVm { get; }
-    public CheckErrorViewModel CheckErrorVm { get; }
-
-    public MainWindowViewModel(
-        MenuViewModel menuVm,
-        ContentViewModel contentVm,
-        SettingsViewModel settingsVm,
-        CardCheckViewModel cardCheckVm,
-        M1ReadViewModel m1ReadVm,
-        PSAMReaderViewModel psamVm,
-        CheckErrorViewModel checkErrorVm)
-    {
-        MenuVm = menuVm;
-        ContentVm = contentVm;
-        SettingsVm = settingsVm;
-        CardCheckVm = cardCheckVm;
-        M1ReadVm = m1ReadVm;
-        PSAMVm = psamVm;
-        CheckErrorVm = checkErrorVm;
-    }
+    public MenuViewModel MenuVm { get; } = menuVm;
+    public ContentViewModel ContentVm { get; } = contentVm;
+    public SettingsViewModel SettingsVm { get; } = settingsVm;
+    public CardCheckViewModel CardCheckVm { get; } = cardCheckVm;
+    public M1ReadViewModel M1ReadVm { get; } = m1ReadVm;
+    public PSAMReaderViewModel PSAMVm { get; } = psamVm;
 
     private int _selectedTabIndex;
 
