@@ -164,7 +164,7 @@
                          VerticalAlignment="Center"
                          Classes.auth-true="{Binding AuthCheck}"
                          Classes.auth-false="{Binding !AuthCheck}" />
-                <TextBlock Text="{Binding CanTry,StringFormat='次数：{0:C}'}" IsVisible="{Binding CanTry,Converter={x:Static StringConverters.IsNotNullOrEmpty}}" VerticalAlignment="Center" MinWidth="20"></TextBlock>
+                <TextBlock Text="{Binding TryCount,StringFormat='次数：{0:C}'}" IsVisible="{Binding TryCount,Converter={x:Static StringConverters.IsNotNullOrEmpty}}" VerticalAlignment="Center" MinWidth="20"></TextBlock>
                 <TextBlock Text="{Binding Respon,StringFormat='返回：{0:C}'}" IsVisible="{Binding Respon,Converter={x:Static StringConverters.IsNotNullOrEmpty}}" VerticalAlignment="Center" MinWidth="20"></TextBlock>
             </StackPanel>
         </Border>
