@@ -10,15 +10,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using D8_Demo.Enum;
 using D8_Demo.Models;
-using D8_Demo.Service;
 using D8_Demo.Tool;
 using MsBox.Avalonia;
 
 namespace D8_Demo.ViewModels;
 
-public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel contentViewModel, SettingsManage settingsManage,CardErrorService cardErrorService) : ViewModelBase
+public partial class CardCheckViewModel : ViewModelBase
 {
-    
     [ObservableProperty] private IImmutableSolidColorBrush findCard = Brushes.Red;
     [ObservableProperty] private string? returnValue; //返回值
     [ObservableProperty] private string? cardType = "未检测到卡片";
@@ -28,7 +26,9 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     [ObservableProperty] private int lastDuration; //上次耗时
     [ObservableProperty] private int count; //计数
 
-    private readonly AppSettings Settings = settingsManage.Settings;
+    private readonly CardHelper CardHelper;
+    private readonly ContentViewModel CVM;
+    private readonly AppSettings Settings;
 
     private static readonly IReadOnlyDictionary<string, string> ChipType =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -67,13 +67,16 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     public bool IsM1 => CardCheckType == CardCheckType.M1;
     public bool IsUl => CardCheckType == CardCheckType.Ul;
 
-    [ObservableProperty] private bool isAuth;//是否进行外部认证
-    [ObservableProperty] private bool authCheck;//外部认证是否通过
-    [ObservableProperty] private string canTry;//可试次数
-    [ObservableProperty] private string respon;//返回信息
+    public CardCheckViewModel(
+        CardHelper cardHelper,
+        ContentViewModel contentViewModel,
+        SettingsManage settingsManage)
+    {
+        CardHelper = cardHelper;
+        CVM = contentViewModel;
+        Settings = settingsManage.Settings;
+    }
 
-    private ulong UID;//记录UID，避免重复外部认证。
-    
     private Task StartAsync()
     {
         if (_cts != null) return Task.CompletedTask;
@@ -110,7 +113,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     [RelayCommand]
     private void CheckChipType()
     {
-        if (!cardHelper.isConnected)
+        if (!CardHelper.isConnected)
         {
             _ = ShowMessage("警告", "请先打开端口");
             return;
@@ -132,7 +135,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
             // 开始计时
             var stopwatch = Stopwatch.StartNew();
             FindCard = Brushes.LimeGreen;
-            if (!cardHelper.Reset())
+            if (!CardHelper.Reset() || CardHelper.FindCard() == 0)
             {
                 AddLog("复位/寻卡失败");
                 Clear();
@@ -140,13 +143,12 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
-            ulong CardUid = cardHelper.FindCard();//获取芯片号
-            
+
             //获取ATQA
-            ATQA = cardHelper.Request();
+            ATQA = CardHelper.Request();
             //获取SAK
-            var uid = cardHelper.Anticoll();
-            if (uid != "") SAK = cardHelper.Select(uid);
+            var uid = CardHelper.Anticoll();
+            if (uid != "") SAK = CardHelper.Select(uid);
             CardCheckType = SAK switch
             {
                 "08" or "18" => CardCheckType.M1,
@@ -155,7 +157,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
                 _ => CardCheckType.Unknown,
             };
             //复位ATS
-            var ats = cardHelper.ResetHex();
+            var ats = CardHelper.ResetHex();
             if (ats == "")
             {
                 //继续判断是M1或UL卡
@@ -167,17 +169,11 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
                 await Task.Delay(Settings.SleepTime, token);
                 continue;
             }
-            //外部认证
-            if(IsAuth && CardUid != UID)
-            {
-                UID = CardUid;
-                AuthCheck = CheckAuth();
-            }
 
             ATS = ats;
             //选择主目录
-            _ = cardHelper.APDU("00A404000C54656D706F726172792E4D46");
-            var response = cardHelper.APDU("80CA00F10A");
+            _ = CardHelper.APDU("00A404000C54656D706F726172792E4D46");
+            var response = CardHelper.APDU("80CA00F10A");
             if (response == null)
             {
                 ReturnValue = "空";
@@ -197,7 +193,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
             }
 
             FindCard = Brushes.Red;
-            cardHelper.Beep(Settings.Sound);
+            CardHelper.Beep(Settings.Sound);
             Count++;
             // 停止计时并记录
             stopwatch.Stop();
@@ -257,14 +253,12 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
 
     void Clear()
     {
-        ReturnValue = string.Empty;
-        ATS = string.Empty;
-        CardType = string.Empty;
-        ATQA = string.Empty;;
-        SAK = string.Empty;
+        ReturnValue = "";
+        ATS = "";
+        CardType = "";
+        ATQA = "";
+        SAK = "";
         CardCheckType = CardCheckType.Unknown;
-        CanTry = string.Empty;
-        Respon = string.Empty;
     }
 
     // 显示消息框
@@ -279,36 +273,6 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     // 添加日志
     void AddLog(string msg)
     {
-        contentViewModel.AddLog(msg);
-    }
-    
-    //外部认证
-    bool CheckAuth()
-    {
-        AddLog("进行外部认证验证");
-        string strRandom = cardHelper.APDU("0084000008");
-        if (string.IsNullOrWhiteSpace(strRandom))
-        {
-            return false;
-        }
-        strRandom = strRandom[..16];
-        byte[] randomBytes = Tools.HexStringToBytes(strRandom);
-        byte[] keyBytes = Tools.HexStringToBytes("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-        byte[] data = Tools.EncryptEcb(randomBytes, keyBytes);
-        string strCommand = "0082000008" + BitConverter.ToString(data).Replace("-", "");
-        AddLog($"指令：{strCommand}");
-        string response = cardHelper.APDU(strCommand);
-        if (response == "9000")
-        {
-            AddLog("外部认证成功");
-            return true;
-        }
-        if (response.Contains("63C")) CanTry = response.Substring(3, 1);
-        else
-        {
-            AddLog("外部认证返回值:" + response);
-            Respon = cardErrorService.GetMessage(response);
-        }
-        return false;
+        CVM.AddLog(msg);
     }
 }
