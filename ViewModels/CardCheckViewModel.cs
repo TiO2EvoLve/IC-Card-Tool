@@ -28,8 +28,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     [ObservableProperty] private int lastDuration; //上次耗时
     [ObservableProperty] private int count; //计数
 
-    private readonly AppSettings Settings = settingsManage.Settings;
-
+    //1280对照表
     private static readonly IReadOnlyDictionary<string, string> ChipType =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -43,16 +42,19 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
             { "165C1", "FM1280-165-C1" },
             { "102A1", "FM1280-102-A1" },
             { "137C3", "FM1280-137-C3" },
+            { "160110A1", "FM1216-110-A1" },
+            { "160109A1", "FM1216-109-A1" },
+            
         };
 
     // 卡片对照表
-    public ObservableCollection<CardTable> Tables { get; } = new()
-    {
-        new CardTable { Name = "S50", Atqa = "4", Sak = "08" },
-        new CardTable { Name = "S70", Atqa = "4", Sak = "18" },
-        new CardTable { Name = "UL", Atqa = "44", Sak = "00" },
-        new CardTable { Name = "CPU", Atqa = "8", Sak = "20" },
-    };
+    public ObservableCollection<CardTable> Tables { get; } =
+    [
+        new() { Name = "S50", Atqa = "4", Sak = "08" },
+        new() { Name = "S70", Atqa = "4", Sak = "18" },
+        new() { Name = "UL", Atqa = "44", Sak = "00" },
+        new() { Name = "CPU", Atqa = "8", Sak = "20" }
+    ];
 
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
@@ -61,7 +63,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
     [NotifyPropertyChangedFor(nameof(IsCpu))]
     [NotifyPropertyChangedFor(nameof(IsM1))]
     [NotifyPropertyChangedFor(nameof(IsUl))]
-    private CardCheckType cardCheckType = CardCheckType.Unknown;
+    private CardCheckType cardCheckType = CardCheckType.Unknown;//卡类型
 
     public bool IsCpu => CardCheckType == CardCheckType.Cpu;
     public bool IsM1 => CardCheckType == CardCheckType.M1;
@@ -101,8 +103,6 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
             Count = 0; //计数归0
             CardType = "已停止检测";
         }
-
-        ;
         _cts.Dispose();
         _cts = null;
     }
@@ -138,7 +138,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
             {
                 Clear();
                 CardType = "未检测到卡片";
-                await Task.Delay(Settings.SleepTime, token);
+                await Task.Delay(settingsManage.Settings.SleepTime, token);
                 continue;
             }
             
@@ -164,7 +164,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
                 // 停止计时并记录
                 stopwatch.Stop();
                 LastDuration = (int)stopwatch.ElapsedMilliseconds;
-                await Task.Delay(Settings.SleepTime, token);
+                await Task.Delay(settingsManage.Settings.SleepTime, token);
                 continue;
             }
             //外部认证
@@ -195,12 +195,12 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
                 FM1208(ATQA, ATS);
             }
             FindCard = Brushes.Red;
-            cardHelper.Beep(Settings.Sound);
+            cardHelper.Beep(settingsManage.Settings.Sound);
             Count++;
             // 停止计时并记录
             stopwatch.Stop();
             LastDuration = (int)stopwatch.ElapsedMilliseconds;
-            await Task.Delay(Settings.SleepTime, token);
+            await Task.Delay(settingsManage.Settings.SleepTime, token);
         }
     }
 
@@ -258,7 +258,7 @@ public partial class CardCheckViewModel(CardHelper cardHelper, ContentViewModel 
         ReturnValue = string.Empty;
         ATS = string.Empty;
         CardType = string.Empty;
-        ATQA = string.Empty;;
+        ATQA = string.Empty;
         SAK = string.Empty;
         CardCheckType = CardCheckType.Unknown;
         AuthCheck = false;

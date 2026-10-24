@@ -270,9 +270,8 @@ public partial class ContentViewModel : ViewModelBase
                             });
                         }
                     });
+                    CardHelper.Beep(Settings.Sound);
                 }
-
-                CardHelper.Beep(Settings.Sound);
                 await Task.Delay(Settings.SleepTime, token);
             }
         }
