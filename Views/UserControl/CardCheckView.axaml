@@ -6,7 +6,6 @@
              xmlns:vm="using:D8_Demo.ViewModels"
              x:DataType="vm:CardCheckViewModel"
              x:Class="D8_Demo.Views.UserControl.CardCheckView">
-    
     <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="20">
         <Border BorderThickness="1" BorderBrush="Lavender" CornerRadius="10" Padding="20">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
@@ -30,7 +29,6 @@
                         <TextBlock Text="{Binding Count, StringFormat='已检测 {0} 轮'}"></TextBlock>
                         <TextBlock Text="{Binding LastDuration, StringFormat='上次耗时 {0} ms'}"></TextBlock>
                     </StackPanel>
-
                 </Grid>
             </Grid>
         </Border>
@@ -169,5 +167,4 @@
             </StackPanel>
         </Border>
     </Grid>
-
 </UserControl>

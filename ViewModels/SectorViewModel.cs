@@ -22,4 +22,5 @@ public partial class SectorViewModel : ViewModelBase
     }
 
     public void SetBlockData(int blockIndex, string data) => Blocks[blockIndex].Data = data;
+    
 }

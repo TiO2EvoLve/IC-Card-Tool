@@ -59,6 +59,16 @@ public partial class M1ReadViewModel : ViewModelBase
 
     private async Task M1ReadSector()
     {
+        //清空数据
+        for (byte i = 0; i < 16; i++)
+        {
+            var sector = Sectors[i];
+            for (byte j = 0; j < 4; j++)
+            {
+                sector.SetBlockData(j, string.Empty);
+            }
+        }
+        
         if (!CardHelper.isConnected)
         {
             await MessageBoxManager.GetMessageBoxStandard("警告", "请先打开端口").ShowAsync();
@@ -71,6 +81,8 @@ public partial class M1ReadViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("警告", "寻卡失败").ShowAsync();
             return;
         }
+
+        
 
         for (byte i = 0; i < 16; i++)
         {
