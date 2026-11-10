@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
-using Avalonia.Threading;
 using D8_Demo.Enum;
 using D8_Demo.Models;
 using D8_Demo.Service;
@@ -103,6 +102,7 @@ public partial class CardCheckViewModel : ReactiveObject
         {
             FindCard = Brushes.Red;
             Count = 0;
+            Clear();
             CardType = "已停止检测";
         }
     }

@@ -24,7 +24,7 @@
                     <Button Width="100" Height="40" Classes="Warning" Command="{Binding StopChipTypeCommand}">停止检测</Button>
                 </StackPanel>
                 <Grid ColumnDefinitions="*,Auto" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnSpacing="20">
-                    <ProgressBar Height="5" Background="Lavender"></ProgressBar>
+                    <ProgressBar  Height="5" Background="Lavender" IsIndeterminate="{Binding IsChecking}"></ProgressBar>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20">
                         <TextBlock Text="{Binding Count, StringFormat='已检测 {0} 轮'}"></TextBlock>
                         <TextBlock Text="{Binding LastDuration, StringFormat='上次耗时 {0} ms'}"></TextBlock>
