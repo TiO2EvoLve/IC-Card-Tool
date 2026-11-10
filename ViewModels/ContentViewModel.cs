@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
@@ -21,6 +20,7 @@ namespace D8_Demo.ViewModels;
 
 public sealed partial class ContentViewModel : ReactiveObject
 {
+    // 读卡器状态机
     private enum ReaderState
     {
         PortClosed,
@@ -36,43 +36,55 @@ public sealed partial class ContentViewModel : ReactiveObject
         StopReading,
         PortLost
     }
-
+    // D8工具函数
     private readonly CardHelper _cardHelper;
+    // 系统设置类
     private readonly AppSettings _settings;
+    // 数据库操作类
     private readonly Mdb _mdb;
     private readonly StateMachine<ReaderState, ReaderTrigger> _machine;
     private CancellationTokenSource? _cts;
     private Task? _runningTask;
 
+    //端口
     [Reactive] private int _port = 100;
+    //频率
     [Reactive] private int _hz = 115200;
 
+    //端口指示灯
     [Reactive(SetModifier = AccessModifier.Private)]
     private IImmutableSolidColorBrush _color = Brushes.Red;
-
+    //读卡指示灯
     [Reactive(SetModifier = AccessModifier.Private)]
     private IImmutableSolidColorBrush _findCard = Brushes.Red;
 
+    //读取的信息参数
     [Reactive(SetModifier = AccessModifier.Private)]
     private string? _uid16, _uid16_, _uid10, _uid10_, _ats, _deviceName, _firmwareVersion;
 
+    //状态展示
     [Reactive(SetModifier = AccessModifier.Private)]
     private State? _status = State.等待读取;
 
+    //比特率下拉框
     public ObservableCollection<string> Options { get; } =
     [
         "1200", "2400", "4800", "9600", "14400", "19200", "28800", "38400", "57600", "115200", "128000", "230400",
         "256000", "460800", "921600"
     ];
-
+    //选中的波特率
     [Reactive] private string? _selectedOption = "115200";
+    //当前卡号
     [Reactive] private string _sn = "1";
+    //是否保存开关
     [Reactive] private bool _isChecked = true;
+    //读卡列表绑定
     public ObservableCollection<Card> Cards { get; } = new();
 
     [Reactive(SetModifier = AccessModifier.Private)]
     private bool _isRunning;
 
+    //日志类
     [Reactive(SetModifier = AccessModifier.Private)]
     private TextDocument _logDoc = new();
 
