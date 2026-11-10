@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net10.0</TargetFramework>
@@ -26,12 +26,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="12.1.4" />
+        <PackageReference Include="Avalonia" Version="12.1.5" />
         <PackageReference Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
-        <PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.5" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.5" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.5" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.22">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">none</IncludeAssets>
@@ -40,20 +40,22 @@
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="DryIoc" Version="5.4.3" />
-        <PackageReference Include="Irihi.Ursa" Version="2.2.0" />
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.2.0" />
-        <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" />
+        <PackageReference Include="Irihi.Ursa" Version="2.3.1" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.3.1" />
+        <PackageReference Include="MessageBox.Avalonia" Version="12.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.14" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.14" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
+        <PackageReference Include="ReactiveUI" Version="26.0.1" />
+        <PackageReference Include="ReactiveUI.SourceGenerators" Version="4.2.0" PrivateAssets="all" />
         <PackageReference Include="Semi.Avalonia" Version="12.1.0.1" />
         <PackageReference Include="Semi.Avalonia.AvaloniaEdit" Version="12.0.0" />
-        <PackageReference Include="System.Data.OleDb" Version="10.0.12" />
-        <PackageReference Include="Tomlyn" Version="2.10.1" />
-        <PackageReference Include="Tommy" Version="3.1.2" />
-        <PackageReference Include="WorkflowCore" Version="3.21.0" />
+        <PackageReference Include="Stateless" Version="5.20.1" />
+        <PackageReference Include="System.Data.OleDb" Version="10.0.14" />
+        <PackageReference Include="System.Reactive" Version="7.0.0" />
+        <PackageReference Include="Tomlyn" Version="2.10.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -86,3 +88,4 @@
       <Folder Include="temple\" />
     </ItemGroup>
 </Project>
+
