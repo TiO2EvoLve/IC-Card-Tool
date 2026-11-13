@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 
@@ -12,6 +13,28 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
+    private void TitleBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginMoveDrag(e);
+        }
+    }
+    private void Close(object? sender, PointerPressedEventArgs e)
+    {
+        Close();
+    }
+
+    private void MaxWindow(object? sender, PointerPressedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void MinWindow(object? sender, PointerPressedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+    
     public void ApplyMicaSetting(bool shouldEnableMica)
     {
         TransparencyLevelHint = shouldEnableMica

@@ -3,15 +3,32 @@
              x:Class="D8_Demo.App"
              xmlns:semi="https://irihi.tech/semi"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    
+    <Application.Resources>
+        <FontFamily x:Key="AlibabaPuHuiTi">avares://D8_Demo/Assets/font/AlibabaPuHuiTi-3-55-Regular.ttf#Alibaba PuHuiTi 3.0</FontFamily>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <semi:SemiTheme Locale="zh-CN" />
-        <semi:UrsaSemiTheme Locale="zh-CN"/>
+        <semi:UrsaSemiTheme Locale="zh-CN" />
         <semi:SemiPopupAnimations />
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <semi:AvaloniaEditSemiTheme />
+        
+        <!-- 为常见文本控件设置全局字体 -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource AlibabaPuHuiTi}" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource AlibabaPuHuiTi}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="{StaticResource AlibabaPuHuiTi}" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="FontFamily" Value="{StaticResource AlibabaPuHuiTi}" />
+        </Style>
     </Application.Styles>
 </Application>

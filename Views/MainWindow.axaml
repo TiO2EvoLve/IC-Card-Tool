@@ -7,23 +7,45 @@
         xmlns:userControl="clr-namespace:D8_Demo.Views.UserControl"
         mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         Height="800" Width="1500"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="BorderOnly"
         WindowStartupLocation="CenterScreen"
         x:Class="D8_Demo.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="D8读卡器工具">
 
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+
+    <Window.Styles>
+        <Style Selector="MenuItem">
+            <Setter Property="Foreground" Value="WhiteSmoke" />
+            <Setter Property="FontFamily" Value="{StaticResource AlibabaPuHuiTi}" />
+        </Style>
+        <Style Selector="MenuItem:pointerover ContentPresenter">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
     <DockPanel LastChildFill="True">
-
-        <!-- 顶部菜单栏 -->
-        <Menu Background="DodgerBlue" DockPanel.Dock="Top" DataContext="{Binding MenuVm}">
-            <MenuItem Header="_端口" Foreground="White">
-                <MenuItem Header="_打开端口" Command="{Binding OpenCommand}" />
-                <MenuItem Header="_关闭端口" Command="{Binding CloseCommand}" />
-                <MenuItem Header="_退出" Command="{Binding ExitCommand}" />
-            </MenuItem>
-        </Menu>
-
+        <Grid PointerPressed="TitleBar_PointerPressed" DockPanel.Dock="Top">
+            <!-- 顶部菜单栏 -->
+            <Menu Background="DodgerBlue" DataContext="{Binding MenuVm}">
+                <MenuItem Header="_端口" Foreground="White">
+                    <MenuItem Header="_打开端口" Command="{Binding OpenCommand}" />
+                    <MenuItem Header="_关闭端口" Command="{Binding CloseCommand}" />
+                    <MenuItem Header="_退出" Command="{Binding ExitCommand}" />
+                </MenuItem>
+            </Menu>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,0,10,0">
+                <Ellipse Width="20" Height="20" Fill="#fa8c16" PointerPressed="MinWindow" />
+                <Ellipse Width="20" Height="20" Fill="#52c41a" PointerPressed="MaxWindow" />
+                <Ellipse Width="20" Height="20" Fill="#ff4d4f" PointerPressed="Close" />
+            </StackPanel>
+        </Grid>
         <!-- 内容区，使用 Grid + GridSplitter 实现左边可拖动 -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -65,9 +87,9 @@
                 <!-- 侧边栏 -->
                 <Border Grid.Row="1" Margin="0,10,0,0" Padding="10" Grid.Column="0" BorderBrush="Lavender"
                         BorderThickness="1" CornerRadius="10">
-                   
-                        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10" DataContext="{Binding ContentVm}">
-                       <TextBlock Text="设备信息" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
+
+                    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10" DataContext="{Binding ContentVm}">
+                        <TextBlock Text="设备信息" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
                         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10"
                                     HorizontalAlignment="Center">
                             <TextBlock Text="设备名:" VerticalAlignment="Center"></TextBlock>
@@ -99,8 +121,8 @@
                         <Button Grid.Row="3" Content="清除日志" Command="{Binding ClearLogsCommand}"
                                 Theme="{DynamicResource SolidButton}" Classes="Warning"
                                 HorizontalAlignment="Stretch" Margin="10,0,10,0" />
-                        </Grid>
-                    
+                    </Grid>
+
                 </Border>
             </Grid>
 

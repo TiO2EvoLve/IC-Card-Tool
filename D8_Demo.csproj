@@ -85,6 +85,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Assets\font\" />
       <Folder Include="temple\" />
     </ItemGroup>
 </Project>
