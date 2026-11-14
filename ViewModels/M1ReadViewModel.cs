@@ -5,6 +5,7 @@ using MsBox.Avalonia;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ReactiveUI.SourceGenerators;
 
 namespace D8_Demo.ViewModels;
 
@@ -19,19 +20,25 @@ public partial class M1ReadViewModel : ViewModelBase
     public ObservableCollection<SectorViewModel> Sectors { get; } = new();
     private readonly CardHelper CardHelper;
     private readonly ContentViewModel CVM;
-    //日志内容
 
-    [ObservableProperty] private string selectedBlockData = "";
+    [ObservableProperty] public string selectedBlockData;
     [ObservableProperty] private string selectedPosition = "未选择";
     [ObservableProperty] private int selectedSectorIndex = -1;
     [ObservableProperty] private int selectedBlockIndex = -1;
 
+    [ObservableProperty] private int inputNum;
+    
     public M1ReadViewModel(CardHelper cardHelper, ContentViewModel contentViewModel)
     {
         CardHelper = cardHelper;
         CVM = contentViewModel;
-        for (int i = 0; i < 16; i++)
-            Sectors.Add(new SectorViewModel(i, this));
+        for (int i = 0; i < 16; i++) Sectors.Add(new SectorViewModel(i, this));
+    }
+    
+    
+    partial void OnSelectedBlockDataChanged(string value)
+    {
+        InputNum = value.Length;
     }
 
     public void SelectBlock(int sectorIndex, int blockIndex)

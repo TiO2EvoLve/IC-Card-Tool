@@ -39,7 +39,6 @@ public partial class App : Application
         container.Register<ReadView>();
         container.Register<CardCheckView>();
         container.Register<M1ReadView>();
-        container.Register<PSAMReader>();
         container.Register<SettingView>();
 
         DataTemplates.Add(new ViewLocator(container));

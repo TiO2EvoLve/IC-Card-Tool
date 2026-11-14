@@ -2,19 +2,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="1000"
              xmlns:vm="using:D8_Demo.ViewModels"
              xmlns:converter="clr-namespace:D8_Demo.Converter"
              x:DataType="vm:M1ReadViewModel"
              x:Class="D8_Demo.Views.UserControl.M1ReadView">
-    <UserControl.Resources>
-        <converter:BoolToRadioConverter x:Key="BoolToRadioConverter"/>
-    </UserControl.Resources>
     
+    <UserControl.Resources>
+        <converter:BoolToRadioConverter x:Key="BoolToRadioConverter" />
+    </UserControl.Resources>
+
     <UserControl.Styles>
         <Style Selector="Button.block-cell">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="#6DE5E5E5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#A4C0C0C0" />
             <Setter Property="Padding" Value="6,4" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -28,9 +30,15 @@
             <Setter Property="Foreground" Value="#52c41a" />
             <Setter Property="BorderThickness" Value="2" />
         </Style>
+        <Style Selector="Button.block-cell:pointerover ContentPresenter">
+            <Setter Property="Background" Value="#f6ffed" />
+            <Setter Property="BorderBrush" Value="#b7eb8f" />
+            <Setter Property="Foreground" Value="#52c41a" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
     </UserControl.Styles>
 
-    <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Grid Margin="10" RowDefinitions="Auto,*,Auto" RowSpacing="20">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
             <ComboBox Width="200" ItemsSource="{Binding PassWorldOptions}"
@@ -51,54 +59,54 @@
                 Converter={StaticResource BoolToRadioConverter},
                 ConverterParameter=False}" />
             </StackPanel>
-            
+
         </StackPanel>
 
-        <Viewbox Grid.Row="1" HorizontalAlignment="Left">
-        <ItemsControl ItemsSource="{Binding Sectors}" Margin="5">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Spacing="8" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:SectorViewModel">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                        <Label Classes="Ghost Blue"
-                               Theme="{DynamicResource TagLabel}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Content="{Binding Title}" />
-                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Blocks}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="4" ColumnSpacing="5"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:BlockCellViewModel">
-                                    <Button Classes="block-cell"
-                                            Classes.selected="{Binding IsSelected}"
-                                            Command="{Binding SelectCommand}">
-                                        <TextBlock Text="{Binding Data}"
-                                                   TextAlignment="Left"
-                                                   FontSize="10" />
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        </Viewbox>
+        <Grid Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Sectors}" Margin="5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="16" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SectorViewModel">
+                        <Grid ColumnDefinitions="0.5*,9.5*" RowSpacing="10" ColumnSpacing="10">
+                            <Label Classes="Ghost Blue"
+                                   Theme="{DynamicResource TagLabel}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Content="{Binding Title}" />
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Blocks}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="4" HorizontalAlignment="Stretch" ColumnSpacing="5" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:BlockCellViewModel">
+                                        <Button Classes="block-cell"
+                                                Classes.selected="{Binding IsSelected}"
+                                                Command="{Binding SelectCommand}">
+                                            <TextBlock Text="{Binding Data}"
+                                                       TextAlignment="Center"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
             <TextBlock Text="块数据：" VerticalAlignment="Center" />
             <TextBox MinWidth="300" Foreground="OrangeRed" Text="{Binding SelectedBlockData}" />
             <TextBlock Text="位置：" VerticalAlignment="Center" />
             <TextBlock Text="{Binding SelectedPosition}" VerticalAlignment="Center" Foreground="Blue" />
-            <Button Content="写入" Command="{Binding WriteCommand}"/>
+            <Button Content="写入" Command="{Binding WriteCommand}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding InputNum,StringFormat='位数：{0}'}" />
         </StackPanel>
     </Grid>
 </UserControl>

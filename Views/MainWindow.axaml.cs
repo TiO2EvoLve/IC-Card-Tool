@@ -11,6 +11,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        //默认全屏运行
+        WindowState = WindowState.Maximized;
     }
 
     private void TitleBar_PointerPressed(object? sender, PointerPressedEventArgs e)
