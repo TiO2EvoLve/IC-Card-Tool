@@ -13,6 +13,7 @@ namespace D8_Demo;
 
 public partial class App : Application
 {
+    public static Container Container { get; private set; }
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -20,38 +21,39 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var container = new Container();
+        Container = new Container();
         
-        container.Register<SettingsManage>(Reuse.Singleton);
-        container.Register<CardHelper>(Reuse.Singleton);
-        container.Register<Mdb>(Reuse.Singleton);
-        container.Register<CardErrorService>(Reuse.Singleton);
+        Container.Register<SettingsManage>(Reuse.Singleton);
+        Container.Register<CardHelper>(Reuse.Singleton);
+        Container.Register<Mdb>(Reuse.Singleton);
+        Container.Register<CardErrorService>(Reuse.Singleton);
 
-        container.Register<MainWindowViewModel>(Reuse.Singleton);
-        container.Register<MenuViewModel>(Reuse.Singleton);
-        container.Register<ContentViewModel>(Reuse.Singleton);
-        container.Register<SettingsViewModel>(Reuse.Singleton);
-        container.Register<CardCheckViewModel>(Reuse.Singleton);
-        container.Register<M1ReadViewModel>(Reuse.Singleton);
-        container.Register<PSAMReaderViewModel>(Reuse.Singleton);
+        Container.Register<MainWindowViewModel>(Reuse.Singleton);
+        Container.Register<MenuViewModel>(Reuse.Singleton);
+        Container.Register<ContentViewModel>(Reuse.Singleton);
+        Container.Register<SettingsViewModel>(Reuse.Singleton);
+        Container.Register<CardCheckViewModel>(Reuse.Singleton);
+        Container.Register<M1ReadViewModel>(Reuse.Singleton);
+        Container.Register<LoadM1KeyViewModel>(Reuse.Singleton);
 
-        container.Register<MainWindow>();
-        container.Register<ReadView>();
-        container.Register<CardCheckView>();
-        container.Register<M1ReadView>();
-        container.Register<SettingView>();
+        Container.Register<MainWindow>();
+        Container.Register<ReadView>();
+        Container.Register<CardCheckView>();
+        Container.Register<M1ReadView>();
+        Container.Register<SettingView>();
+        Container.Register<LoadM1KeyView>();
 
-        DataTemplates.Add(new ViewLocator(container));
+        DataTemplates.Add(new ViewLocator(Container));
         
-        container.Resolve<CardErrorService>();
+        Container.Resolve<CardErrorService>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = container.Resolve<MainWindow>();
-            mainWindow.DataContext = container.Resolve<MainWindowViewModel>();
-            mainWindow.ApplyMicaSetting(container.Resolve<SettingsManage>().Settings.EnableMica);
+            var mainWindow = Container.Resolve<MainWindow>();
+            mainWindow.DataContext = Container.Resolve<MainWindowViewModel>();
+            mainWindow.ApplyMicaSetting(Container.Resolve<SettingsManage>().Settings.EnableMica);
             desktop.MainWindow = mainWindow;
-            desktop.Exit += (_, _) => container.Dispose();
+            desktop.Exit += (_, _) => Container.Dispose();
         }
 
         base.OnFrameworkInitializationCompleted();

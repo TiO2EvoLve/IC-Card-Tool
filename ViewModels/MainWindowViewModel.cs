@@ -8,8 +8,7 @@ public partial class MainWindowViewModel(
     ContentViewModel contentVm,
     SettingsViewModel settingsVm,
     CardCheckViewModel cardCheckVm,
-    M1ReadViewModel m1ReadVm,
-    PSAMReaderViewModel psamVm)
+    M1ReadViewModel m1ReadVm)
     : ViewModelBase
 {
     public MenuViewModel MenuVm { get; } = menuVm;
@@ -17,7 +16,6 @@ public partial class MainWindowViewModel(
     public SettingsViewModel SettingsVm { get; } = settingsVm;
     public CardCheckViewModel CardCheckVm { get; } = cardCheckVm;
     public M1ReadViewModel M1ReadVm { get; } = m1ReadVm;
-    public PSAMReaderViewModel PSAMVm { get; } = psamVm;
 
     private int _selectedTabIndex;
 

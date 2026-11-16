@@ -1,0 +1,33 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        WindowStartupLocation="CenterScreen"
+        Width="500" Height="700"
+        x:Class="D8_Demo.Views.LoadM1KeyView"
+        xmlns:vm="using:D8_Demo.ViewModels"
+        x:DataType="vm:LoadM1KeyViewModel"
+        Title="装载M1扇区密码">
+    
+        <Design.DataContext>
+                <vm:LoadM1KeyViewModel />
+        </Design.DataContext>
+        
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        
+        <ItemsControl ItemsSource="{Binding KeyList}" >
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Value, Mode=TwoWay}"
+                             Margin="0,4"
+                             PlaceholderText="请输入..." />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        
+        <Button Grid.Row="1" Command="{Binding LoadingKeyCommand}">装载</Button>
+    </Grid>
+        
+        
+</Window>

@@ -5,6 +5,8 @@ using MsBox.Avalonia;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using D8_Demo.Views;
+using DryIoc;
 using ReactiveUI.SourceGenerators;
 
 namespace D8_Demo.ViewModels;
@@ -63,7 +65,7 @@ public partial class M1ReadViewModel : ViewModelBase
 
     [RelayCommand]
     private void Read() => _ = M1ReadSector();
-
+    
     private async Task M1ReadSector()
     {
         //清空数据
@@ -88,9 +90,7 @@ public partial class M1ReadViewModel : ViewModelBase
             await MessageBoxManager.GetMessageBoxStandard("警告", "寻卡失败").ShowAsync();
             return;
         }
-
         
-
         for (byte i = 0; i < 16; i++)
         {
             var sector = Sectors[i];
@@ -155,4 +155,13 @@ public partial class M1ReadViewModel : ViewModelBase
             CVM.AddLog("M1修改失败");
         }
     }
+    
+    [RelayCommand]
+    private void LoadKey()
+    {
+        //打开密钥装载界面
+        LoadM1KeyView view = App.Container.Resolve<LoadM1KeyView>();
+        view.Show();
+    }
+    
 }

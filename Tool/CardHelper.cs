@@ -44,8 +44,7 @@ public class CardHelper
         dc_authentication_passaddr(int icdev, byte _Mode, byte _Addr, [In] byte[] passbuff); //M1密码验证
 
     [DllImport("dcrf32.dll")]
-    private static extern short
-        dc_authentication_pass(int icdev, byte _Mode, byte _Addr, [In] byte[] passbuff); //M1密码验证
+    private static extern short dc_authentication_pass(int icdev, byte _Mode, byte _Addr, [In] byte[] passbuff); //M1密码验证
 
     [DllImport("dcrf32.dll")]
     private static extern short dc_read(int icdev, byte adr, [Out] byte[] sdata); //M1读扇区
@@ -66,15 +65,11 @@ public class CardHelper
     private static extern int dc_setcpu(int icdev, byte _Byte); //设置PSAM卡座
 
     [DllImport("dcrf32.dll")]
-    public static extern short dc_cpureset(int icdev, ref byte rlen, [Out] byte[] databuffer); //接触式卡复位
-
-    [DllImport("dcrf32.dll")]
-    private static extern int dc_cpuapduInt_hex(int icdev, int slen, string sendbuffer, ref int rlen,
-        ref byte databuffer); //接触式卡指令交互
-
+    public static extern short dc_cpureset(int icdev, ref byte rlen, [Out] byte[] databuffer); //PSAM卡复位
+    
     [DllImport("dcrf32.dll")]
     public static extern short dc_cpuapduInt(int icdev, int slen, [In] byte[] sendbuffer, ref uint rlen,
-        [Out] byte[] databuffer);
+        [Out] byte[] databuffer);//PSAM卡发指令
 
     //设备号
     private int icdev;
@@ -319,24 +314,6 @@ public class CardHelper
     }
 
     /// <summary>
-    /// 加载密码
-    /// </summary>
-    /// <param name="secnr"></param>
-    /// <param name="strKey"></param>
-    /// <param name="KeyStyle"></param>
-    /// <returns></returns>
-    public bool LodeKey(int secnr, string strKey, int KeyStyle)
-    {
-        byte[] hexkey = new byte[6];
-        if (dc_load_key(icdev, KeyStyle, secnr, hexkey) != 0)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
     /// M1密码验证
     /// </summary>
     /// <param name="_Mode">模式</param>
@@ -395,13 +372,13 @@ public class CardHelper
     }
 
     /// <summary>
-    /// 加载密钥
+    /// 装载密钥
     /// </summary>
-    /// <param name="secnr"></param>
-    /// <param name="strKey"></param>
-    /// <param name="KeyStyle"></param>
+    /// <param name="secnr">地址</param>
+    /// <param name="strKey">密钥</param>
+    /// <param name="KeyStyle">模式</param>
     /// <returns></returns>
-    public bool LoadKey(int secnr, string strKey, int KeyStyle)
+    public bool LoadKey(int secnr, string strKey, int KeyStyle = 0)
     {
         byte[] hexkey = new byte[6];
         hexkey = Enumerable.Range(0, strKey.Length / 2)

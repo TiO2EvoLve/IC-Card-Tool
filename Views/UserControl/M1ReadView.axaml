@@ -7,7 +7,6 @@
              xmlns:converter="clr-namespace:D8_Demo.Converter"
              x:DataType="vm:M1ReadViewModel"
              x:Class="D8_Demo.Views.UserControl.M1ReadView">
-    
     <UserControl.Resources>
         <converter:BoolToRadioConverter x:Key="BoolToRadioConverter" />
     </UserControl.Resources>
@@ -43,6 +42,7 @@
             <TextBlock Text="扇区密码:" VerticalAlignment="Center" />
             <ComboBox Width="200" ItemsSource="{Binding PassWorldOptions}"
                       SelectedItem="{Binding PassWorld, Mode=TwoWay}" />
+            <Button Command="{Binding LoadKeyCommand}" Theme="{DynamicResource SolidButton}" Classes="Primary">装载</Button>
             <Button Command="{Binding ReadCommand}" Theme="{DynamicResource SolidButton}" Classes="Success">读取</Button>
             <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="10">
                 <RadioButton
